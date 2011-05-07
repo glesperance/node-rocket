@@ -115,9 +115,6 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
   }
   , add: function () {
     try {
-      var fs = require("fs");
-      var path = require("path");
-
       if (rocket.argv.length < 1) {
         rocket.error("A page name is expected.");
         process.exit(1);
@@ -133,7 +130,7 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
       }
       
       if (path.existsSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"))
-         || path.existsSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".page.controller.js"))
+         || path.existsSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"))
          || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0]))
          || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"))) {
         rocket.error("Looks like you already have that page!");
@@ -141,7 +138,7 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
       }
 
       fs.writeFileSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"), "Put content here.");
-      fs.writeFileSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".page.controller.js"), "Put content here.");
+      fs.writeFileSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"), "Put content here.");
       fs.mkdirSync(path.join(process.cwd(), "views", rocket.argv[0]), 0777);
       fs.writeFileSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"), "Put content here.");
       console.log("The rocket landed the page.");
@@ -155,11 +152,11 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
     console.log([
         "Usage: rocket [OPTIONS] ARGUMENTS\n" 
         , "Arguments:" 
-        , "  create nameOfProject    create a rocket project"
-        , "  add pageName            add a new page to the project"
+        , "  create NAME_OF_YOUR_PROJECT    create a rocket project ()"
+        , "  add PAGE_NAME                  add a new page to the project"
         , "Options:" 
-        , "  -v, --verbose           show what's under the rocket." 
-        , "  -h, --help              show this message." ].join("\n") );
+        , "  -v, --verbose                  show what's under the rocket." 
+        , "  -h, --help                     show this message." ].join("\n") );
   }
 }
 
