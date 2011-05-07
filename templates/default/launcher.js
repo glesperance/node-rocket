@@ -39,7 +39,7 @@ function setupMiddlewares(err, app) {
   app.use('/static', express.static(CLIENT_STATIC_DIR));
   
   app.use(require('browserify')({
-      base : CLIENT_DIR,
+      base : CLIENT_LIBS_DIR,
       mount : '/browserify.js',
       filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined),
       require: ['dnode']
@@ -66,6 +66,7 @@ rocket.setupControllers(
   function finishSetupAndStart(err, app) {
     
     var dirs;
+    var myExports = {};
     
     if(err){
       throw(err);
@@ -77,8 +78,14 @@ rocket.setupControllers(
     
     dirs = fs.readdirSync(EXPORTS_DIR);
     
+    
+    
     _.each(dirs,function dnodeExporter(file) {
-      dnode(require(file)).listen(app);
+      var objName = file.split(".")[0];
+      var obj = require(file);
+      myExports[objName] = obj;
     });
+    
+    dnode(myExports).listen(app);
   }
 );
