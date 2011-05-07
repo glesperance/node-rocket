@@ -43,14 +43,13 @@ body
 		
 	//- Grab JQuery Tools CDN's jQuery. fall back to local if necessary
   
-	script(src="/dnode.js")
 	script(src="/browserify.js")
 	
 	!="<script>"
-	!="var boot_options, Bootstraper = require('./bootstrapers/" + path + "_bootstraper').Bootstraper;"
+	!="var boot_options, Bootstraper = require('./bootstrapers/" + path + "_bootstraper');"
 	-if (typeof boot_options != 'undefined' && boot_options != null)
 		!="boot_options = " + JSON.stringify(boot_options) + ";"
-	!="var b = new Bootstraper(boot_options);"
+	!="Bootstraper.bootstrap(boot_options);"
 	!="</script>"
 
 	/if lt IE 7
