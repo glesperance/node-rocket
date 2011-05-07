@@ -1,21 +1,25 @@
 {
-  "name": "rocket",
-  "description": "The rapid development framework for node.js",
-  "version": "0.0.0",
-  "homepage": "wavo.me",
-  "repository": {},
-  "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)",
-  "main": "main",
-  "engines": {
+  "name": "rocket"
+, "description": "The rapid development framework for node.js"
+, "version": "0.0.0"
+, "homepage": "wavo.me"
+, "repository": {}
+, "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)"
+, "main": "main"
+, "engines": {
     "node": ">= 0.4.4"
-  },
-  "dependencies": {
-        "express" : ">= 1.0.7",
-        "jade" : ">= 0.6.3",
-        "underscore" : "1.1.4",
-        "dnode" : "0.6.8",
-        "browserify" : "0.3.1",
-        "uglify-js" : "1.0.1",
-        "coffee-script" : "1.0.1"
   }
+, "dependencies": {
+      "express" : ">= 1.0.7"
+    , "jade" : ">= 0.6.3"
+    , "underscore" : "1.1.4"
+    , "dnode" : "0.6.8"
+    , "browserify" : "0.3.1"
+    , "uglify-js" : "1.0.1"
+    , "coffee-script" : "1.0.1"
+  }
+, "licenses" :
+    [{
+      "type" : "MIT" 
+    }]
 }
