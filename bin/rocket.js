@@ -166,6 +166,7 @@ if (parsed.argv.cooked.length == 0) {
 rocket.log("Running command: " + rocket.command);
 if (! rocket.commands.hasOwnProperty(rocket.command) ) {
   rocket.error("Unknown command: " + rocket.command);
+  rocket.commands.help();
   return
 }
 rocket.commands[rocket.command](rocket.argv)
