@@ -25,7 +25,7 @@ exports.setupControllers = function (app, dir, callback) {
 
                 // Build a wrapper to prefill the view                                
                 if (view_index != -1) {
-                    var new_cont = {}
+                    var new_func = {}
                       , view = views[view_index]
                       , cont_export = require(dir + '/controllers/' + view + '.controller.js')
                       , cont_keys = _.keys(cont_export)
@@ -40,7 +40,7 @@ exports.setupControllers = function (app, dir, callback) {
                         }
 
                         if(cont_keys.indexOf(tmpl_name) != -1) {                     
-                            new_cont[tmpl_name] = (function(dir, view, name, tmpl_name, cont_export) {
+                            new_func[tmpl_name] = (function(dir, view, name, tmpl_name, cont_export) {
                                     return function(req, res) {                   
                                         var json = require(dir + '/controllers/' + view + '.controller.js')[tmpl_name]();
                                         res.send(app.render(dir  + '/views/' + name + '/' + view_tmpl, json));
@@ -63,12 +63,13 @@ exports.setupControllers = function (app, dir, callback) {
                             }
                         }
                     }
+                }
 
-                    if (name === 'root') {                      
-                        app.resource(new_func);
-                    } else {
-                        app.resource(name, new_funcs);
-                    }
+
+                if (name === 'root') {                      
+                    app.resource(new_func);
+                } else {
+                    app.resource(name, new_func);
                 }
             });
 
