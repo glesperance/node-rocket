@@ -22,6 +22,9 @@ var rocket = {
   command: command
 , argv: argv
 , verbose: parsed.verbose 
+, error : function (msg) {
+    console.error("Houston.. we have a problem: " + msg);
+  }
 , log : function (msg) {
     if (rocket.verbose) {
       console.log(msg);
@@ -34,7 +37,7 @@ try {
   rocket.version = j.version
   rocket.nodeVersionRequired = j.engines.node
   if (!semver.satisfies(process.version, j.engines.node)) {
-    log.error([""
+    rocket.error([""
                ,"rocket requires node version: "+j.engines.node
                ,"And you have: "+process.version
                ,"which is not satisfactory."
@@ -66,13 +69,9 @@ var nodeVer = process.version
   , reqVer = rocket.nodeVersionRequired
 
 if (reqVer && !semver.satisfies(nodeVer, reqVer)) {
-  console.error("rocket doesn't work with node " + nodeVer + "\nRequired: node@" + reqVer)
+  rocket.error("rocket doesn't work with node " + nodeVer + "\nRequired: node@" + reqVer)
   return
 }
-
-process.on("uncaughtException", function(er) {
-  console.error(er);
-});
 
 if (parsed.help && rocket.command !== "help") {
   rocket.argv.unshift(rocket.command)
@@ -82,20 +81,17 @@ if (parsed.help && rocket.command !== "help") {
 rocket.commands = {
   create: function () {
     if (rocket.argv.length < 1) {
-      console.error("A project name is expected when creating a project.");
+      rocket.error("A project name is expected when creating a project.");
       process.exit(1);
     }
-    console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
-
-    if (path.exists(process.cwd() + "\" + rocket.argv[0])) {
-      console.error("The project directory already exist. Please remove " + process.cwd() + "\" + rocket.argv[0] + " and start again.");
+console.log(path.join(process.cwd(), rocket.argv[0]));
+    if (path.existsSync(path.join(process.cwd(), rocket.argv[0]))) {
+      rocket.error("The project directory (" + path.join(process.cwd(), rocket.argv[0]) + ") already exists.");
       process.exit(1);
+    } else {
+      console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
+      require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), path.join(process.cwd(), rocket.argv[0])]);
     }
-    else {
-      require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), process.cwd() + "\" + rocket.argv[0]]);
-    }
-
-
   }
   , help: function () {
     console.log([
@@ -108,9 +104,9 @@ rocket.commands = {
   }
 }
 
-if (! rocket.hasOwnProperty(rocket.command) ) {
-  console.error("Unknown command :" + rocket.command);
-  return;
+if (! rocket.commands.hasOwnProperty(rocket.command) ) {
+  rocket.error("Unknown command: " + rocket.command);
+  return
 }
 rocket.commands[rocket.command](rocket.argv)
 })()
