@@ -5,7 +5,7 @@ var fs = require("fs")
 
 exports.setupControllers = function (app, dir, callback) {
 
-    this.set = function(views) {
+    this.set = function(views, call) {
 
         fs.readdir(dir + '/controllers/', function(err, files) {
             if (err !== null) {
@@ -80,21 +80,27 @@ exports.setupControllers = function (app, dir, callback) {
                 app._rocket_routes.push(name);
             });
 
-            callback(app);                
+            call(app);                
         });
     };
 
-    this.getViewFolders = function() {
-      var that = this;
+    this.getViewFolders = function(dir) {
+        if dir.length == 0 {
+            callback(app);
+        }
+
+        var that = this;
         fs.readdir(dir + '/views/', function(err, view_folders) {
             if (err !== null) {
                 throw(err);
             }
 
-            that.set(view_folders);
+            that.set(view_folders, function(app) {
+                this.getViewFolders(dir.shift())
+            });
         });
     }
 
-    this.getViewFolders();
+    this.getViewFolders(dir);
 }
 
