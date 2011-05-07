@@ -28,6 +28,7 @@
   }
 , "licenses" :
     [{
-      "type" : "MIT" 
+      "type" : "MIT"
+    , "url" : "https://github.com/glesperance/node-rocket/raw/master/LICENSE"
     }]
 }
