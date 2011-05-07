@@ -1,7 +1,6 @@
 # Node-Rocket 
 
-  ![Alt text](/libs/logo.png)
-
+  <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks yo!" />
   The rapid development framework for node.js web apps.
 
 ## Installation
@@ -9,6 +8,16 @@
     $ npm install rocket
 
 ## Usage
+  
+    Usage: rocket [OPTIONS] ARGUMENTS
+
+    Arguments:
+      create NAME_OF_YOUR_PROJECT    create a rocket project (Shouldn't exist)
+      add PAGE_NAME                  add a new page to the project (From the root of your project)
+    Options:
+      -v, --verbose                  show what's under the rocket.
+      -h, --help                     show this message.
+
 
   To get started you first need to create a new project using the `rocket`
   command.
@@ -21,11 +30,13 @@
     $ rocket create MyRocketProject
   
   If you want to create the sample `hello_world` project use the 
-  `-t` template as argument :
+  `-t` template as argument. It will create a project named `HelloWorld` in the current directory.
   
     $ rocket create -t hello_world HelloWorld
    
-   This will create a project named `HelloWorld` in the current directory.
+  To add all the necessary files for a new page/controller you can user `add`. It will also make sure you are in
+  the root of your project.
+    $ rocket add pageName
    
 ## Directory Sructure of *default* a rocket-project
 
