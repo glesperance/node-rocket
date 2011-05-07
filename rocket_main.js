@@ -1,6 +1,9 @@
-var RocketMain = {
+var RocketMain = function() {
+    var fs = require("fs")
+      , _ = require("underscore");
 
-    setUpControllers: function (app, dir, callback) {
+
+    this.setUpControllers = function (app, dir, callback) {
 
         this.set = function(views) {
 
@@ -72,7 +75,7 @@ var RocketMain = {
         }
 
         this.getViewFolders();
-    }
+    }express-resource
 }
 
-exports.setUpControllers = RocketMain.setUpControllers;
+exports.setUpControllers = RocketMain();
