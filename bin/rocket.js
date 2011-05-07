@@ -73,10 +73,6 @@ if (reqVer && !semver.satisfies(nodeVer, reqVer)) {
   return
 }
 
-process.on("uncaughtException", function(er) {
-  console.error(er);
-});
-
 if (parsed.help && rocket.command !== "help") {
   rocket.argv.unshift(rocket.command)
   rocket.command = "help"
@@ -90,14 +86,15 @@ rocket.commands = {
     }
     console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
 
-    if (path.exists(process.cwd() + "\" + rocket.argv[0])) {
-      console.error("The project directory already exist. Please remove " + process.cwd() + "\" + rocket.argv[0] + " and start again.");
+    console.log(path.join(__dirname, "../templates/default"));
+console.log(path.join(process.cwd(), rocket.argv[0]));
+    if (path.exists(path.join(process.cwd(), rocket.argv[0]))) {
+      console.error("The project directory already exist. Please remove " + process.cwd() + "\" + rocket.argv[0] +  and start again.");
       process.exit(1);
     }
     else {
-      require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), process.cwd() + "\" + rocket.argv[0]]);
+      require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), path.join(process.cwd(), rocket.argv[0])]);
     }
-
 
   }
   , help: function () {
@@ -111,9 +108,9 @@ rocket.commands = {
   }
 }
 
-if (! rocket.hasOwnProperty(rocket.command) ) {
-  console.error("Unknown command :" + rocket.command);
-  return;
+if (! rocket.commands.hasOwnProperty(rocket.command) ) {
+  console.error("Unknown command: " + rocket.command);
+  return
 }
 rocket.commands[rocket.command](rocket.argv)
 })()
