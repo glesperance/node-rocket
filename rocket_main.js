@@ -52,16 +52,18 @@ exports.setupControllers = function (app, dir, callback) {
                     app.resource(name, new_cont);
                 } else {
                     // Go here if the Controller has no View              
-                    var control = require(dir + '/controllers/' + file);
-                          , funcs = _.functions(control);
-                          , new_func = {}                        
+                    var control = require(dir + '/controllers/' + file)
+                      , funcs = _.functions(control)
+                      , new_func = {};                        
                     for(var i = 0; i < funcs.len; i++) {
-                        new_funcs[funcs[i]] = function (req, res) {
-                            var ret = control[funcs[i]](req, res);
-                            if(ret != undefined && ret != null){
-                                res.send(ret);
+                        new_funcs[funcs[i]] = (funtion(i, funcs, control) {
+                            return function (req, res) {
+                                var ret = control[funcs[i]](req, res);
+                                if(ret != undefined && ret != null){
+                                    res.send(ret);
+                                }
                             }
-                        }
+                        })(i, funcs, control)
                     }
                 }
 
