@@ -11,7 +11,7 @@
   }
 , "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)"
 , "main": "rocket_main"
-, "bin" : "./bin/rocket.js"
+, "bin" : { "rocket" : "./bin/rocket.js" }
 , "engines": {
     "node": ">= 0.4.4"
   }
