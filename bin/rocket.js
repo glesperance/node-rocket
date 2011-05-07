@@ -37,7 +37,7 @@ try {
   rocket.version = j.version
   rocket.nodeVersionRequired = j.engines.node
   if (!semver.satisfies(process.version, j.engines.node)) {
-    log.error([""
+    rocket.error([""
                ,"rocket requires node version: "+j.engines.node
                ,"And you have: "+process.version
                ,"which is not satisfactory."
@@ -69,7 +69,7 @@ var nodeVer = process.version
   , reqVer = rocket.nodeVersionRequired
 
 if (reqVer && !semver.satisfies(nodeVer, reqVer)) {
-  console.error("rocket doesn't work with node " + nodeVer + "\nRequired: node@" + reqVer)
+  rocket.error("rocket doesn't work with node " + nodeVer + "\nRequired: node@" + reqVer)
   return
 }
 
@@ -105,7 +105,7 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
 }
 
 if (! rocket.commands.hasOwnProperty(rocket.command) ) {
-  console.error("Unknown command: " + rocket.command);
+  rocket.error("Unknown command: " + rocket.command);
   return
 }
 rocket.commands[rocket.command](rocket.argv)
