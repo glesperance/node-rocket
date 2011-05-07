@@ -89,6 +89,16 @@ rocket.commands = {
       process.exit(1);
     }
     console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
+
+    if (path.exists(process.cwd() + "\" + rocket.argv[0])) {
+      console.error("The project directory already exist. Please remove " + process.cwd() + "\" + rocket.argv[0] + " and start again.");
+      process.exit(1);
+    }
+    else {
+      require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), process.cwd() + "\" + rocket.argv[0]]);
+    }
+
+
   }
   , help: function () {
     console.log([

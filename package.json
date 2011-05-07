@@ -5,7 +5,7 @@
 , "homepage": "wavo.me"
 , "repository": {}
 , "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)"
-, "main": "main"
+, "main": "rocket_main"
 , "engines": {
     "node": ">= 0.4.4"
   }
