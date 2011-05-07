@@ -61,19 +61,17 @@ app.set("view engine", 'jade');
 app.set("views", VIEWS_DIR);
 app.register(".jade",require('jade'));
 
+app._rocket_routes = [];
+
 //Call rocket's controller setup routine
 rocket.setupControllers(
   app, 
   APP_DIR, 
   
-  function finishSetupAndStart(err, app) {
+  function finishSetupAndStart(app) {
     
     var dirs;
     var myExports = {};
-    
-    if(err){
-      throw(err);
-    }
     
     setupMiddlewares(app);
     
