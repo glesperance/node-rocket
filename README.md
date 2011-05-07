@@ -8,6 +8,16 @@
     $ npm install rocket
 
 ## Usage
+  
+    Usage: rocket [OPTIONS] ARGUMENTS
+
+    Arguments:
+      create NAME_OF_YOUR_PROJECT    create a rocket project (Shouldn't exist)
+      add PAGE_NAME                  add a new page to the project (From the root of your project)
+    Options:
+      -v, --verbose                  show what's under the rocket.
+      -h, --help                     show this message.
+
 
   To get started you first need to create a new project using the `rocket`
   command.
