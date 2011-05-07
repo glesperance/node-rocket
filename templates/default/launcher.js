@@ -66,8 +66,7 @@ app._rocket_routes = [];
 //Call rocket's controller setup routine
 rocket.setupControllers(
   app, 
-  APP_DIR, 
-  
+  APP_DIR,
   function finishSetupAndStart(app) {
     
     var dirs;
@@ -81,7 +80,7 @@ rocket.setupControllers(
     
     _.each(dirs,function dnodeExporter(file) {
       var objName = file.split(".")[0];
-      console.log(EXPORTS_DIR + file);
+
       var obj = require(EXPORTS_DIR + file);
       myExports[objName] = obj;
     });

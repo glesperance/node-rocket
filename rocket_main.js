@@ -59,7 +59,7 @@ exports.setupControllers = function (app, dir, callback) {
                     for(var i = 0; i < funcs.length; i++) {
                         wrapped_funcs[funcs[i]] = (function(i, funcs, control) {
                             return function (req, res) {
-                              console.log("Here. !");
+
                                 var ret = control[funcs[i]](req, res);
                                 if(ret != undefined && ret != null){
                                     res.send(ret);
@@ -68,8 +68,6 @@ exports.setupControllers = function (app, dir, callback) {
                         })(i, funcs, control)
                     }
                 }
-                
-                console.log(require('util').inspect(wrapped_funcs));
 
                 if (name === 'root') {
                     app.resource(wrapped_funcs);
