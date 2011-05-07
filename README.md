@@ -1,6 +1,6 @@
 # Node-Rocket
 
-  The rapid development framework for node.js/couchDB web apps.
+  The rapid development framework for node.js web apps.
 
 ## Installation
 

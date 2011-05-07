@@ -15,9 +15,9 @@ head
 	!='<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" >'
 	
 	-if (typeof(title) != "undefined" && title !=null)
-		title= title + '- Wavo'
+		title= title + '- Rocket'
 	-else
-		title= 'Wavo: Jump In.'
+		title= 'The rapid development framework for node.js/couchDB web apps.'
 
 	meta(name="description", content="")
 	meta(name="author", content="")
@@ -34,40 +34,15 @@ head
 	
 	//- All JavaScript at the bottom, except for Modernizr &  docReady array
 	
-	script(type="text/javascript")
-		docReady = [];
 	script(src="/static/js/libs/modernizr-1.6.min.js")
 
 body
-	#navbar
-		ul
-			li 
-				a(id="login", rel='#login_form') Login
-			li 
-				a(id="register", rel='#register_form') Register
-			li 
-				a(id="apply_alpha", rel='#apply_alpha_form') Apply for the alpha
-
-	.outer
-		.inner
-			#wrapper!=body
-			
-	.footer.hidden
-		
-	div!=partial("partials/helpers/dialog", {locals: {id: "login_form", action: "/auth/login", method: "post", title: "Login", inputs: partial('partials/dialogs/login'), trigger: "login"}})
-
-	//- twitter style "drawer" for displaying validation errors
-	#error_drawer="[ERROR MESSAGE]"
-
+  h3="Hello World !"
+  
 	//- Javascript at the bottom for fast page loading
 		
 	//- Grab JQuery Tools CDN's jQuery. fall back to local if necessary
-	
-	script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js")
-	
-	script(type='text/javascript')
-		if(typeof jQuery == "undefined"){document.write(unescape('%3Cscript src=\"/static/js/libs/jquery/1.4.4/jquery.min.js\"%3E%3C/script%3E'));}
-	
+  
 	script(src="/dnode.js")
 	script(src="/browserify.js")
 	
@@ -79,14 +54,9 @@ body
 	!="</script>"
 
 	/if lt IE 7
-		script(src="/static/js/libs/dd_belatedpng.js")
 		script(type="text/javascript")
+      require("./libs/dd_belatedpng.js");
 			DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images
-	
-	//- yui profiler and profileviewer - remove for production 
-	//- script(src="/static/js/profiling/yahoo-profiling.min.js")
-	//- script(src="/static/js/profiling/config.js")
-	//- end profiling code
 	
 	// asynchronous google analytics: mathiasbynens.be/notes/async-analytics-snippet change the UA-XXXXX-X to be your site's ID 
 	
