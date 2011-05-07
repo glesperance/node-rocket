@@ -1,4 +1,6 @@
-# Node-Rocket
+# Node-Rocket 
+
+  ![Alt text](/libs/logo.png)
 
   The rapid development framework for node.js web apps.
 
