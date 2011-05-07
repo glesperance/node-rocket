@@ -1,11 +1,17 @@
 {
   "name": "rocket"
 , "description": "The rapid development framework for node.js"
+, "keywords": [ "rad", "MVC", "model view controller", "comet", "Notman House", "Rapid Development", "Rockets", "NASA", "National Aeronautics and Space Administration" ]
 , "version": "0.0.0"
+, "preferGlobal" : true
 , "homepage": "wavo.me"
-, "repository": {}
+, "repository":
+  { "type" : "git"
+  , "url" : "git://github.com/glesperance/node-rocket.git"
+  }
 , "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)"
 , "main": "rocket_main"
+, "bin" : "./bin/rocket.js"
 , "engines": {
     "node": ">= 0.4.4"
   }
@@ -24,6 +30,7 @@
   }
 , "licenses" :
     [{
-      "type" : "MIT" 
+      "type" : "MIT"
+    , "url" : "https://github.com/glesperance/node-rocket/raw/master/LICENSE"
     }]
 }
