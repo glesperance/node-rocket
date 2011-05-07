@@ -93,11 +93,50 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
       require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), path.join(process.cwd(), rocket.argv[0])]);
     }
   }
+  , add: function () {
+    try {
+      var fs = require("fs");
+      var path = require("path");
+
+      if (rocket.argv.length < 1) {
+        rocket.error("A page name is expected.");
+        process.exit(1);
+      }
+
+      if (!path.existsSync(path.join(process.cwd(), "client"))
+          || !path.existsSync(path.join(process.cwd(), "controllers"))
+          || !path.existsSync(path.join(process.cwd(), "views"))
+          || !path.existsSync(path.join(process.cwd(), "exports"))
+          || !path.existsSync(path.join(process.cwd(), "models"))) {
+        rocket.error("You must be in the project root directory.");
+        process.exit(1);
+      }
+      
+      if (path.existsSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"))
+         || path.existsSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".page.controller.js"))
+         || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0]))
+         || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"))) {
+        rocket.error("Looks like you already have that page!");
+        process.exit(1);
+      }
+
+      fs.writeFileSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"), "Put content here.");
+      fs.writeFileSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".page.controller.js"), "Put content here.");
+      fs.mkdirSync(path.join(process.cwd(), "views", rocket.argv[0]), 0777);
+      fs.writeFileSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"), "Put content here.");
+      console.log("The rocket landed the page.");
+    }
+    catch (err) {
+      rocket.error(err);
+      process.exit(1);
+    }
+  }
   , help: function () {
     console.log([
         "Usage: rocket [OPTIONS] ARGUMENTS\n" 
         , "Arguments:" 
-        , "  create nameOfProject    create a rocket project" 
+        , "  create nameOfProject    create a rocket project"
+        , "  add pageName            add a new page to the project"
         , "Options:" 
         , "  -v, --verbose           show what's under the rocket." 
         , "  -h, --help              show this message." ].join("\n") );
