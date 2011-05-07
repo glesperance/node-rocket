@@ -1,4 +1,4 @@
-var rocket = require("node-rocket");
+var rocket = require("rocket");
 var express = require("express");
 var dnode = require("dnode");
 var fs = require("fs");
