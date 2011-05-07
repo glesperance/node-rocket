@@ -52,10 +52,22 @@ exports.setupControllers = function (app, dir, callback) {
                     app.resource(name, new_cont);
                 } else {
                     // Go here if the Controller has no View              
-                    if (name === 'root') {
-                        app.resource(require(dir + '/controllers/' + file));
+                    var control = require(dir + '/controllers/' + file);
+                          , funcs = _.functions(control);
+                          , new_func = {}                        
+                    for(var i = 0; i < funcs.len; i++) {
+                        new_funcs[funcs[i]] = function (req, res) {
+                            var ret = control[funcs[i]](req, res);
+                            if(ret != undefined && ret != null){
+                                res.send(ret);
+                            }
+                        }
+                    }
+
+                    if (name === 'root') {                      
+                        app.resource(new_func);
                     } else {
-                        app.resource(name, require(dir + '/controllers/' + file));
+                        app.resource(name, new_funcs);
                     }
                 }
             });
