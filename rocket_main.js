@@ -9,15 +9,17 @@ exports.setupControllers = function (app, dir, callback) {
 
         fs.readdir(dir + '/controllers/', function(err, files) {
             if (err !== null) {
-              throw(err);
-                //callback(err, app);
-                return
+                throw(err);
             }
 
             _.each(files, function(file) {
                 var file_split = file.split(".")
                   , name = file_split[file_split.length - 3]
                   , view_index = views.indexOf(name);
+
+                if (app._rocket_routes.indexOf(name) !== -1) {
+                    throw("Route already in use");
+                }
 
                 if (file_split[file_split.length - 2] !== 'controller') {
                     return;
@@ -69,15 +71,16 @@ exports.setupControllers = function (app, dir, callback) {
                 
                 console.log(require('util').inspect(wrapped_funcs));
 
-                if (name === 'root') {   
-                                       
+                if (name === 'root') {
                     app.resource(wrapped_funcs);
                 } else {
                     app.resource(name, wrapped_funcs);
                 }
+
+                app._rocket_routes.push(name);
             });
 
-            callback(null, app);                
+            callback(app);                
         });
     };
 
@@ -85,9 +88,7 @@ exports.setupControllers = function (app, dir, callback) {
       var that = this;
         fs.readdir(dir + '/views/', function(err, view_folders) {
             if (err !== null) {
-              throw(err);
-               //callback(err, app);
-                return;
+                throw(err);
             }
 
             that.set(view_folders);
