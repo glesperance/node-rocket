@@ -9,7 +9,7 @@
   { "type" : "git"
   , "url" : "git://github.com/glesperance/node-rocket.git"
   }
-, "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)"
+, "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com / wavo.me)"
 , "main": "rocket_main"
 , "bin" : "./bin/rocket.js"
 , "engines": {
