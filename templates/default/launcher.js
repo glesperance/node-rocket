@@ -1,4 +1,4 @@
-var rocket = require("node-rocket");
+var rocket = require("rocket");
 var express = require("express");
 var Resource = require("express-resource");
 var dnode = require("dnode");
@@ -14,9 +14,11 @@ var USE_UGLIFY_JS = true;
 /******************************************************************************
  * CONSTANTS
  */
+var LISTEN_PORT = 3000;
+ 
 var APP_DIR = __dirname;
 var VIEWS_DIR = APP_DIR + "/views/";
-var EXPORTS_DIR = APP_DIR + "/exports";
+var EXPORTS_DIR = APP_DIR + "/exports/";
 
 var CLIENT_DIR = APP_DIR + "/client/";
 var CLIENT_LIBS_DIR = CLIENT_DIR + "/libs/";
@@ -35,7 +37,7 @@ function uglifyFilter(orig_code) {
   return pro.gen_code(ast);       // compressed code here
 }
 
-function setupMiddlewares(err, app) {
+function setupMiddlewares(app) {
   app.use(express.bodyParser());
   app.use('/static', express.static(CLIENT_STATIC_DIR));
   
@@ -56,8 +58,8 @@ var app = express.createServer();
 
 //Setup Jade view engine
 app.set("view engine", 'jade');
-app.express.set("views", VIEWS_DIR);
-app.express.register(".jade",require('jade'));
+app.set("views", VIEWS_DIR);
+app.register(".jade",require('jade'));
 
 //Call rocket's controller setup routine
 rocket.setupControllers(
@@ -79,11 +81,10 @@ rocket.setupControllers(
     
     dirs = fs.readdirSync(EXPORTS_DIR);
     
-    
-    
     _.each(dirs,function dnodeExporter(file) {
       var objName = file.split(".")[0];
-      var obj = require(file);
+      console.log(EXPORTS_DIR + file);
+      var obj = require(EXPORTS_DIR + file);
       myExports[objName] = obj;
     });
     
