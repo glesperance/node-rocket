@@ -1,6 +1,6 @@
 # Node-Rocket 
 
-  ![Node Rocket Rocks yo !](https://github.com/glesperance/node-rocket/raw/master/libs/logo.png)
+  <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks yo!" />
   The rapid development framework for node.js web apps.
 
 ## Installation
