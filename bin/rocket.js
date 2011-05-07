@@ -22,6 +22,9 @@ var rocket = {
   command: command
 , argv: argv
 , verbose: parsed.verbose 
+, error : function (msg) {
+    console.error("Houston.. we have a problem: " + msg);
+  }
 , log : function (msg) {
     if (rocket.verbose) {
       console.log(msg);
