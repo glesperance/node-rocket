@@ -17,7 +17,7 @@ head
 	-if (typeof(title) != "undefined" && title !=null)
 		title= title + '- Rocket'
 	-else
-		title= 'The rapid development framework for node.js/couchDB web apps.'
+		title= 'Rocket: The rapid development framework for node.js/couchDB web apps.'
 
 	meta(name="description", content="")
 	meta(name="author", content="")
@@ -36,8 +36,7 @@ head
 	
 	script(src="/static/js/libs/modernizr-1.6.min.js")
 
-body
-  h3="Hello World !"
+body!=body
   
 	//- Javascript at the bottom for fast page loading
 		
