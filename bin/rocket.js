@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-# Big thanks to rocket for its nice script.
+# Big thanks to NPM for its nice script.
 ;(function () { // wrapper in case we're in module_context mode
 var log = require("../lib/utils/log")
 log.waitForConfig()
