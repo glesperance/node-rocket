@@ -1,5 +1,6 @@
 var rocket = require("rocket");
 var express = require("express");
+var Resource = require("express-resource");
 var dnode = require("dnode");
 var fs = require("fs");
 var _ = require("underscore");
