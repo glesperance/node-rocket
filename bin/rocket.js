@@ -20,7 +20,7 @@ rocket.command = rocket.argv.shift();
 rocket.log("Running command: " + rocket.command);
 
 if (parsed.version) {
-  rocket.log(rocket.version)
+  console.log(rocket.version)
   return
 } else rocket.log("rocket@"+rocket.version, "using")
 rocket.log("node@"+process.version, "using");
@@ -43,12 +43,6 @@ if (parsed.help && rocket.command !== "help") {
   rocket.command = "help"
 }
 
-// now actually fire up rocket and run the command.
-// this is how to use rocket programmatically:
-conf._exit = true
-rocket.load(conf, function (er) {
-  if (er) return console.error("Error while running command" + rocket.command + ": " + er);
-  rocket.commands[rocket.command](rocket.argv)
-})
+rocket.commands[rocket.command](rocket.argv)
 })()
 
