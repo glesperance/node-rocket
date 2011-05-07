@@ -1,50 +1,44 @@
 #!/usr/bin/env node
 
-# Big thanks to NPM for its nice script.
+// Big thanks to NPM for its nice script.
 ;(function () { // wrapper in case we're in module_context mode
-var log = require("../lib/utils/log")
-log.waitForConfig()
-log.info("ok", "it worked if it ends with"
-var fs = require("../lib/utils/graceful-fs")
-  , path = require("path")
-  , sys = require("../lib/utils/sys")
+var path = require("path")
   , rocket = require("../rocket")
-  , ini = require("../lib/utils/ini")
-  , rm = require("../lib/utils/rm-rf")
-  , errorHandler = require("../lib/utils/error-handler")
-
-  , configDefs = require("../lib/utils/config-defs")
-  , shorthands = configDefs.shorthands
-  , types = configDefs.types
   , nopt = require("nopt")
+  , knownOpts = { "help" : Boolean
+                , "verbose" : Boolean
+                , "version" : Boolean
+                }
+  , shortHands = { "h" : ["--help"]
+                 , "v" : ["--verbose"]
+                 }
+  , parsed = nopt(knownOpts, shortHands, process.argv, 2)
+rocket.verbose=parsed.verbose 
+rocket.argv= parsed.argv.remain;
+rocket.command = rocket.argv.shift();
 
-log.verbose(process.argv, "cli")
+rocket.log("Running command: " + rocket.command);
 
-var conf = nopt(types, shorthands)
-rocket.argv = conf.argv.remain
-if (rocket.deref(rocket.argv[0])) rocket.command = rocket.argv.shift()
-else conf.usage = true
-
-
-if (conf.version) {
-  console.log(rocket.version)
+if (parsed.version) {
+  rocket.log(rocket.version)
   return
-} else log("rocket@"+rocket.version, "using")
-log("node@"+process.version, "using")
+} else rocket.log("rocket@"+rocket.version, "using")
+rocket.log("node@"+process.version, "using");
 
 // make sure that this version of node works with this version of rocket.
 var semver = require("semver")
   , nodeVer = process.version
   , reqVer = rocket.nodeVersionRequired
 if (reqVer && !semver.satisfies(nodeVer, reqVer)) {
-  return errorHandler(new Error(
-    "rocket doesn't work with node " + nodeVer
-    + "\nRequired: node@" + reqVer), true)
+  console.error("rocket doesn't work with node " + nodeVer + "\nRequired: node@" + reqVer)
+  return
 }
 
-process.on("uncaughtException", errorHandler)
+process.on("uncaughtException", function(er) {
+    console.error(er);
+});
 
-if (conf.usage && rocket.command !== "help") {
+if (parsed.help && rocket.command !== "help") {
   rocket.argv.unshift(rocket.command)
   rocket.command = "help"
 }
@@ -53,8 +47,8 @@ if (conf.usage && rocket.command !== "help") {
 // this is how to use rocket programmatically:
 conf._exit = true
 rocket.load(conf, function (er) {
-  if (er) return errorHandler(er)
-  rocket.commands[rocket.command](rocket.argv, errorHandler)
+  if (er) return console.error("Error while running command" + rocket.command + ": " + er);
+  rocket.commands[rocket.command](rocket.argv)
 })
 })()
 
