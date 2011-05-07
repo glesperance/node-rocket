@@ -9,7 +9,7 @@ exports.setupControllers = function (app, dir, callback) {
 
         fs.readdir(dir + '/controllers/', function(err, files) {
             if (err !== null) {
-            	throw(err);
+              throw(err);
                 //callback(err, app);
                 return
             }
@@ -25,7 +25,7 @@ exports.setupControllers = function (app, dir, callback) {
 
                 // Build a wrapper to prefill the view                                
                 if (view_index != -1) {
-                    var new_func = {}
+                    var wrapped_funcs = {}
                       , view = views[view_index]
                       , cont_export = require(dir + '/controllers/' + view + '.controller.js')
                       , cont_keys = _.keys(cont_export)
@@ -40,24 +40,24 @@ exports.setupControllers = function (app, dir, callback) {
                         }
 
                         if(cont_keys.indexOf(tmpl_name) != -1) {                     
-                            new_func[tmpl_name] = (function(dir, view, name, tmpl_name, cont_export) {
+                            wrapped_funcs[tmpl_name] = (function(dir, view, name, tmpl_name, cont_export) {
                                     return function(req, res) {                   
                                         var json = require(dir + '/controllers/' + view + '.controller.js')[tmpl_name]();
-                                        res.send(app.render(dir  + '/views/' + name + '/' + view_tmpl, json));
+                                        res.render(dir  + '/views/' + name + '/' + view_tmpl, _.extend(json, {controller: name}));
                                     }
                             })(dir, view, name, tmpl_name, cont_export);
                         }
                     });
 
-                    app.resource(name, new_cont);
                 } else {
                     // Go here if the Controller has no View              
                     var control = require(dir + '/controllers/' + file)
                       , funcs = _.functions(control)
-                      , new_func = {};                        
-                    for(var i = 0; i < funcs.len; i++) {
-                        new_funcs[funcs[i]] = (funtion(i, funcs, control) {
+                      , wrapped_funcs = {};                        
+                    for(var i = 0; i < funcs.length; i++) {
+                        wrapped_funcs[funcs[i]] = (function(i, funcs, control) {
                             return function (req, res) {
+                              console.log("Here. !");
                                 var ret = control[funcs[i]](req, res);
                                 if(ret != undefined && ret != null){
                                     res.send(ret);
@@ -66,12 +66,14 @@ exports.setupControllers = function (app, dir, callback) {
                         })(i, funcs, control)
                     }
                 }
+                
+                console.log(require('util').inspect(wrapped_funcs));
 
-
-                if (name === 'root') {                      
-                    app.resource(new_func);
+                if (name === 'root') {   
+                                       
+                    app.resource(wrapped_funcs);
                 } else {
-                    app.resource(name, new_func);
+                    app.resource(name, wrapped_funcs);
                 }
             });
 
@@ -80,10 +82,10 @@ exports.setupControllers = function (app, dir, callback) {
     };
 
     this.getViewFolders = function() {
-    	var that = this;
+      var that = this;
         fs.readdir(dir + '/views/', function(err, view_folders) {
             if (err !== null) {
-            	throw(err);
+              throw(err);
                //callback(err, app);
                 return;
             }

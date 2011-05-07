@@ -1,6 +1,25 @@
 #!/usr/bin/env node
 
 // Big thanks to NPM for its nice script.
+/*
+          /\
+         /  \
+        /    \
+       /______\
+      |        |
+      |        |
+      |        |
+      |        |
+      |        |
+      |        |
+     /|   ||   |\
+    / |   ||   | \
+   /  |   ||   |  \
+  /___|   ||   |___\
+      |        |
+       \      /
+        ||  ||
+*/
 ;(function () { // wrapper in case we're in module_context mode
 var path = require("path")
   , abbrev = require("abbrev")
@@ -23,7 +42,8 @@ var rocket = {
 , argv: argv
 , verbose: parsed.verbose 
 , error : function (msg) {
-    console.error("Houston.. we have a problem: " + msg);
+    console.error("Houston.. we have a problem. >>> " + msg);
+    rocket.commands.help();
   }
 , log : function (msg) {
     if (rocket.verbose) {

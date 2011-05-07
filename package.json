@@ -4,14 +4,14 @@
 , "keywords": [ "rad", "MVC", "model view controller", "comet", "Notman House", "Rapid Development", "Rockets", "NASA", "National Aeronautics and Space Administration" ]
 , "version": "0.0.0"
 , "preferGlobal" : true
-, "homepage": "wavo.me"
+, "homepage": "http://wavo.me"
 , "repository":
   { "type" : "git"
   , "url" : "git://github.com/glesperance/node-rocket.git"
   }
-, "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com)"
+, "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com / wavo.me)"
 , "main": "rocket_main"
-, "bin" : "./bin/rocket.js"
+, "bin" : { "rocket" : "./bin/rocket.js" }
 , "engines": {
     "node": ">= 0.4.4"
   }
