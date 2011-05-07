@@ -81,21 +81,17 @@ if (parsed.help && rocket.command !== "help") {
 rocket.commands = {
   create: function () {
     if (rocket.argv.length < 1) {
-      console.error("A project name is expected when creating a project.");
+      rocket.error("A project name is expected when creating a project.");
       process.exit(1);
     }
-    console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
-
-    console.log(path.join(__dirname, "../templates/default"));
 console.log(path.join(process.cwd(), rocket.argv[0]));
-    if (path.exists(path.join(process.cwd(), rocket.argv[0]))) {
-      console.error("The project directory already exist. Please remove " + process.cwd() + "\" + rocket.argv[0] +  and start again.");
+    if (path.existsSync(path.join(process.cwd(), rocket.argv[0]))) {
+      rocket.error("The project directory (" + path.join(process.cwd(), rocket.argv[0]) + ") already exists.");
       process.exit(1);
-    }
-    else {
+    } else {
+      console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
       require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), path.join(process.cwd(), rocket.argv[0])]);
     }
-
   }
   , help: function () {
     console.log([
