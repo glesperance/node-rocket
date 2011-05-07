@@ -1,20 +1,17 @@
 function dnodeReceiver(remote){
 	console.log("--- Connected to server.");
 	
-	setInterval(3000, function(){ 
+	setInterval(function(){ 
 		console.log("<<< Ping!");
 		remote.ping.sendPing("Ping!", function pongReceiver(msg){
 			console.log(">>> " + msg);
 		});
-	});
+	}, 3000);
 }
 
-exports.bootstrap = function() {
+exports.bootstrap = function(){
 	var dnode = require("dnode");
 	
-	console.log("--- Default bootstraper here !");
-	console.log("--- connecting to dnode server !");
-	
+	console.log("--- connecting to server.");
 	dnode.connect(dnodeReceiver);
-	
 }
