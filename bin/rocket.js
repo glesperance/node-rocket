@@ -43,7 +43,6 @@ var rocket = {
 , verbose: parsed.verbose 
 , error : function (msg) {
     console.error("Houston.. we have a problem. >>> " + msg);
-    rocket.commands.help();
   }
 , log : function (msg) {
     if (rocket.verbose) {
@@ -73,8 +72,6 @@ try {
   rocket.version = ex
 }
 
-rocket.log("Running command: " + rocket.command);
-
 if (parsed.version) {
   console.log(rocket.version)
   return
@@ -93,23 +90,18 @@ if (reqVer && !semver.satisfies(nodeVer, reqVer)) {
   return
 }
 
-if (parsed.help && rocket.command !== "help") {
-  rocket.argv.unshift(rocket.command)
-  rocket.command = "help"
-}
-
 rocket.commands = {
   create: function () {
     if (rocket.argv.length < 1) {
       rocket.error("A project name is expected when creating a project.");
       process.exit(1);
     }
-console.log(path.join(process.cwd(), rocket.argv[0]));
+    console.log(path.join(process.cwd(), rocket.argv[0]));
     if (path.existsSync(path.join(process.cwd(), rocket.argv[0]))) {
       rocket.error("The project directory (" + path.join(process.cwd(), rocket.argv[0]) + ") already exists.");
       process.exit(1);
     } else {
-      console.log("This is creating project \"" + rocket.argv[0] + "\" in " + process.cwd());
+      console.log("3 2 1 Take Off! Project " + rocket.argv[0] + " created.");
       require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), path.join(process.cwd(), rocket.argv[0])]);
     }
   }
@@ -141,7 +133,7 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
       fs.writeFileSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"), "Put content here.");
       fs.mkdirSync(path.join(process.cwd(), "views", rocket.argv[0]), 0777);
       fs.writeFileSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"), "Put content here.");
-      console.log("The rocket landed the page.");
+      console.log("The rocket landed. Page " + rocket.argv[0] + " created.");
     }
     catch (err) {
       rocket.error(err);
@@ -152,14 +144,26 @@ console.log(path.join(process.cwd(), rocket.argv[0]));
     console.log([
         "Usage: rocket [OPTIONS] ARGUMENTS\n" 
         , "Arguments:" 
-        , "  create NAME_OF_YOUR_PROJECT    create a rocket project ()"
-        , "  add PAGE_NAME                  add a new page to the project"
+        , "  create NAME_OF_YOUR_PROJECT    create a rocket project (Shouldn't exist)"
+        , "  add PAGE_NAME                  add a new page to the project (From the root of your project)"
         , "Options:" 
         , "  -v, --verbose                  show what's under the rocket." 
         , "  -h, --help                     show this message." ].join("\n") );
   }
 }
 
+if (parsed.help) {
+  rocket.argv.unshift(rocket.command)
+  rocket.command = "help"
+}
+
+if (parsed.argv.cooked.length == 0) {
+  rocket.error("No argument given.");
+  rocket.commands.help();
+  return
+}
+
+rocket.log("Running command: " + rocket.command);
 if (! rocket.commands.hasOwnProperty(rocket.command) ) {
   rocket.error("Unknown command: " + rocket.command);
   return
