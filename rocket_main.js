@@ -1,106 +1,114 @@
-
 var fs = require("fs")
   , _ = require("underscore");
 
 
 exports.setupControllers = function (app, dir, callback) {
 
-    this.set = function(views, call) {
+  /**
+   * @param name String = name of the Controller
+   * @param method String = name of the Method
+   * @param has_view Bool = true if this Controller's Method has that view
+   *
+   * Builds a wrapper function sending raw json as a response if no view is found
+   * or a rendered view
+   */
+  this.buildWrapper = function(name, method, has_view) {
+    if(has_view) {
+      return function(req, res) {
+        var methods = require(dir + '/controllers/' + name + '.controller.js');
+        var json = methods[method]();
 
-        fs.readdir(dir + '/controllers/', function(err, files) {
-            if (err !== null) {
-                throw(err);
-            }
+        res.render(dir + '/views/' + name + '/' + name + '.' +  method + '.jade', _.extend(json, {controller: name}));
+      };
+    } else {
+      return function(req, res) {
+        var methods = require(dir + '/controllers/' + name + '.controller.js');
+        var json = methods[method]();
 
-            _.each(files, function(file) {
-                var file_split = file.split(".")
-                  , name = file_split[file_split.length - 3]
-                  , view_index = views.indexOf(name);
+        res.send(json);
+      }
+    }
+  }
 
-                if (app._rocket_routes.indexOf(name) !== -1) {
-                    throw("Route already in use");
-                }
+  /**
+   * @param name String = name of the Controller
+   * @param has_view Bool = true if the controller has a matching view
+   *
+   * Uses information from searchFolders to add the controller URL
+   * to the app, introduces a wrapping function around these controller
+   * calls.
+   */
+  this.setController = function(name, has_view) {
+    var wrapped_funcs = {}
+      , view_methods = []
+      , split = []
+      , controller_methods = _.functions(require(dir + '/controllers/' + name + '.controller.js'));
 
-                if (file_split[file_split.length - 2] !== 'controller') {
-                    return;
-                }
-
-                // Build a wrapper to prefill the view                                
-                if (view_index != -1) {
-                    var wrapped_funcs = {}
-                      , view = views[view_index]
-                      , cont_export = require(dir + '/controllers/' + view + '.controller.js')
-                      , cont_keys = _.keys(cont_export)
-                      , view_tmpls = fs.readdirSync(dir + '/views/' + view)
-
-                    _.each(view_tmpls, function(view_tmpl) {
-                        var tmpl_split = view_tmpl.split(".")
-                          , tmpl_name = tmpl_split[tmpl_split.length - 3];
-
-                        if(tmpl_split[tmpl_split.length - 2] != 'view') {
-                            return;
-                        }
-
-                        if(cont_keys.indexOf(tmpl_name) != -1) {                     
-                            wrapped_funcs[tmpl_name] = (function(dir, view, name, tmpl_name, cont_export) {
-                                    return function(req, res) {                   
-                                        var json = require(dir + '/controllers/' + view + '.controller.js')[tmpl_name]();
-                                        res.render(dir  + '/views/' + name + '/' + view_tmpl, _.extend(json, {controller: name}));
-                                    }
-                            })(dir, view, name, tmpl_name, cont_export);
-                        }
-                    });
-
-                } else {
-                    // Go here if the Controller has no View              
-                    var control = require(dir + '/controllers/' + file)
-                      , funcs = _.functions(control)
-                      , wrapped_funcs = {};                        
-                    for(var i = 0; i < funcs.length; i++) {
-                        wrapped_funcs[funcs[i]] = (function(i, funcs, control) {
-                            return function (req, res) {
-                              console.log("Here. !");
-                                var ret = control[funcs[i]](req, res);
-                                if(ret != undefined && ret != null){
-                                    res.send(ret);
-                                }
-                            }
-                        })(i, funcs, control)
-                    }
-                }
-                
-                console.log(require('util').inspect(wrapped_funcs));
-
-                if (name === 'root') {
-                    app.resource(wrapped_funcs);
-                } else {
-                    app.resource(name, wrapped_funcs);
-                }
-
-                app._rocket_routes.push(name);
-            });
-
-            call(app);                
-        });
-    };
-
-    this.getViewFolders = function(dir) {
-        if dir.length == 0 {
-            callback(app);
-        }
-
-        var that = this;
-        fs.readdir(dir + '/views/', function(err, view_folders) {
-            if (err !== null) {
-                throw(err);
-            }
-
-            that.set(view_folders, function(app) {
-                this.getViewFolders(dir.shift())
-            });
-        });
+    if (app._rocket_routes.indexOf(name) !== -1) {
+      throw("Route already in use");
     }
 
-    this.getViewFolders(dir);
-}
+    if (has_view) {
+      // Get the methods for which views exist
+      view_methods = fs.readdirSync(dir + '/views/' + name);
 
+      for(var i = 0; len = view_methods.length, i < len; i++) {
+        split = view_methods[i].split('.');
+        view_methods[i] = split[split.length - 2];
+      }
+    }
+
+    for(var i = 0; len = controller_methods.length, i < len; i++) {
+      var method_view = false;
+
+      if(view_methods.indexOf(controller_methods[i]) !== -1) {
+        method_view = true;
+      }
+
+      wrapped_funcs[controller_methods[i]] = this.buildWrapper(name, controller_methods[i], method_view);
+    }
+
+    if (name === 'root') {
+      app.resource(wrapped_funcs);
+    } else {
+      app.resource(name, wrapped_funcs);
+    }
+  }
+
+  /**
+   * Gets the name of each controller and searches through the view folder
+   * to see wether it finds a corresponding view
+   */
+  this.searchFolders = function() {
+    var controllers = fs.readdirSync(dir + '/controllers/')
+      , views = fs.readdirSync(dir + '/views/')
+      , has_view = false
+      , split = [];
+
+    for(var i = 0; len = views.length, i < len; i++) {
+      // Gets dir/name and returns name
+      split = views[i].split('/');
+      views[i] = split[split.length - 1];
+    }
+
+    for(var i = 0; len = controllers.length, i < len; i++) {
+       // Gets dir/name.controller.js and returns name
+      split = controllers[i].split('.');
+      var controller = split[split.length - 3];
+
+      if(split[split.length - 2] !== 'controller') {
+        break;
+      }
+
+      if(views.indexOf(controller) !== -1) {
+        has_view = true;
+      }
+
+      this.setController(controller, has_view);
+    }
+
+    callback(app);
+  }
+
+  this.searchFolders();
+}
