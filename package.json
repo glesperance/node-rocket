@@ -1,7 +1,7 @@
 {
   "name": "rocket"
 , "description": "The rapid development framework for node.js"
-, "keywords": [ "rad", "MVC", "model view controller", "comet", "Notman House", "Rapid Development", "Rockets", "NASA", "National Aeronautics and Space Administration" ]
+, "keywords": ["mvc", "model view controller", "comet","rapid development", "Rocket", "framework"]
 , "version": "0.0.1"
 , "preferGlobal" : true
 , "homepage": "http://wavo.me"

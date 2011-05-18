@@ -29,9 +29,10 @@ var CLIENT_STATIC_DIR = CLIENT_DIR + "/static/";
  */
  
 function uglifyFilter(orig_code) {
-  var jsp = require("uglify-js").parser;
-  var pro = require("uglify-js").uglify;
-  var ast = jsp.parse(orig_code); // parse code and get the initial AST
+  var jsp = require("uglify-js").parser
+    , pro = require("uglify-js").uglify
+    , ast = jsp.parse(orig_code); // parse code and get the initial AST
+    
   ast = pro.ast_mangle(ast);      // get a new AST with mangled names
   ast = pro.ast_squeeze(ast);     // get an AST with compression optimizations
   return pro.gen_code(ast);       // compressed code here
@@ -69,8 +70,8 @@ rocket.setupControllers(
   APP_DIR,
   function finishSetupAndStart(app) {
     
-    var dirs;
-    var myExports = {};
+    var dirs
+      , myExports = {};
     
     setupMiddlewares(app);
     

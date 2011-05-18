@@ -1,6 +1,6 @@
 # Node-Rocket 
 
-  <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks yo!" />
+  <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
   The rapid development framework for node.js web apps.
 
 ## Installation
@@ -28,67 +28,30 @@
   the *default* template you do :
   
     $ rocket create MyRocketProject
-  
-  If you want to create the sample `hello_world` project use the 
-  `-t` template as argument. It will create a project named `HelloWorld` in the current directory.
-  
-    $ rocket create -t hello_world HelloWorld
    
-  To add all the necessary files for a new page/controller you can user `add`. It will also make sure you are in
-  the root of your project.
+  You can also create create new controllers by using the `add` command while being *in your project directory* :
     $ rocket add pageName
    
-## Directory Sructure of *default* a rocket-project
+## Directory Sructure of a Rocket Project
 
     ./MyRocketProject/
     |
     |-- client
-    |    |-- css
-    |    |
-    |    |-- libs
-    |    |    |-- bootstrapers
-    |    |    |     |- default_bootstraper.js
-    |    |    |     
-    |    |    |- jquery.min.1.5.x.js
-    |    |
-    |    |-- static
-    |         |- favicon.ico
-    |         |- apple-touch-icon.png
+    |    # Contains all the files used by the client, including CSS, Javascript libraries and 
+    |    # static files.
     |
     |-- controllers
-    |     |- messages_controller.js
-    |
+    |    # Contains your application's controllers.
+    |     
     |-- exports
-    |     |- ping_receiver.js
+    |    # Contains your application's modules that will be exported to the client. 
     |
     |-- models
+    |    # Contains all your applications's models and dataasources.
     |
     |-- views
-    |     |- layout.jade
+    |    # Contains your applications's main layout, template files and associated
+    |    # partials/helpers.
     |
-    |- config.json
-    |- app.js
+    |- launcher.js
 
-### client
-
-  This directory contains all the files which are sent or directly accessible by
-  the client.
-  
-#### libs
-
-  In this directory are stored all the javascript files that are used by the
-  client. Currently, *Node-Rocket* uses *browserify* in order to make each of
-  these files accessible to the client via the `require` command.
-  
-  e.g.:
-    
-    require('jquery.min.1.5.x");
-
-##### bootstrapers
-
-##### Boot sequence
-
-
-
-  
-  
