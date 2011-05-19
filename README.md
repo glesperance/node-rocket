@@ -1,3 +1,7 @@
+# THIS IS A WORK IN PRORGESS
+  node-rocket is in its early stage at the moment. This message will be removed
+  when it will be suitable for *unstable but less chaotic* use.
+  
 # Node-Rocket 
 
   <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
