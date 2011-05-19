@@ -2,7 +2,7 @@ var fs = require("fs")
   , _ = require("underscore");
 
 
-exports.setupControllers = function (app, dir, callback) {
+exports.setupControllers = function (app, top_dir, callback) {
 
   /**
    * @param name String = name of the Controller
@@ -12,7 +12,7 @@ exports.setupControllers = function (app, dir, callback) {
    * Builds a wrapper function sending raw json as a response if no view is found
    * or a rendered view
    */
-  this.buildWrapper = function(name, method, has_view) {
+  this.buildWrapper = function(name, method, has_view, dir) {
     if(has_view) {
       return function(req, res) {
         var methods = require(dir + '/controllers/' + name + '.controller.js');
@@ -38,7 +38,7 @@ exports.setupControllers = function (app, dir, callback) {
    * to the app, introduces a wrapping function around these controller
    * calls.
    */
-  this.setController = function(name, has_view) {
+  this.setController = function(name, has_view, dir) {
     var wrapped_funcs = {}
       , view_methods = []
       , split = []
@@ -65,7 +65,7 @@ exports.setupControllers = function (app, dir, callback) {
         method_view = true;
       }
 
-      wrapped_funcs[controller_methods[i]] = this.buildWrapper(name, controller_methods[i], method_view);
+      wrapped_funcs[controller_methods[i]] = this.buildWrapper(name, controller_methods[i], method_view, dir);
     }
 
     if (name === 'root') {
@@ -79,7 +79,7 @@ exports.setupControllers = function (app, dir, callback) {
    * Gets the name of each controller and searches through the view folder
    * to see wether it finds a corresponding view
    */
-  this.searchFolders = function() {
+  this.searchFolders = function(dir) {
     var controllers = fs.readdirSync(dir + '/controllers/')
       , views = fs.readdirSync(dir + '/views/')
       , has_view = false
@@ -104,11 +104,25 @@ exports.setupControllers = function (app, dir, callback) {
         has_view = true;
       }
 
-      this.setController(controller, has_view);
+      this.setController(controller, has_view, dir);
+    }
+  }
+
+  /**
+   * This function starts the controller set up, setting the main controllers and
+   * views then running through the plugin dirs
+   */
+  this.init = function() {
+    var plugins = fs.readdirSync(top_dir + '/plugins/');
+
+    this.searchFolders(top_dir);
+
+    for(var i = 0; len = plugins.length, i < len; i++) {
+      this.searchFolders(top_dir + '/plugins/' + plugins[i]);
     }
 
     callback(app);
   }
 
-  this.searchFolders();
+  this.init();
 }
