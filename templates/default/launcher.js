@@ -15,10 +15,11 @@ var USE_UGLIFY_JS = true;
  * CONSTANTS
  */
 var LISTEN_PORT = 3000;
- 
+
 var APP_DIR = __dirname;
 var VIEWS_DIR = APP_DIR + "/views/";
-var EXPORTS_DIR = APP_DIR + "/exports/";
+var PLUGIN_DIR = APP_DIR + "/plugins/";
+var EXPORT_DIRS = [APP_DIR + "/exports/"];
 
 var CLIENT_DIR = APP_DIR + "/client/";
 var CLIENT_LIBS_DIR = CLIENT_DIR + "/libs/";
@@ -27,7 +28,7 @@ var CLIENT_STATIC_DIR = CLIENT_DIR + "/static/";
 /******************************************************************************
  * UTILITY FUNCTIONS
  */
- 
+
 function uglifyFilter(orig_code) {
   var jsp = require("uglify-js").parser
     , pro = require("uglify-js").uglify
@@ -41,7 +42,7 @@ function uglifyFilter(orig_code) {
 function setupMiddlewares(app) {
   app.use(express.bodyParser());
   app.use('/static', express.static(CLIENT_STATIC_DIR));
-  
+
   app.use(require('browserify')({
       base : CLIENT_LIBS_DIR,
       mount : '/browserify.js',
@@ -66,25 +67,33 @@ app._rocket_routes = [];
 
 //Call rocket's controller setup routine
 rocket.setupControllers(
-  app, 
+  app,
   APP_DIR,
   function finishSetupAndStart(app) {
-    
     var dirs
+      , plugins
       , myExports = {};
-    
-    setupMiddlewares(app);
-    
-    app.listen(LISTEN_PORT);
-    
-    dirs = fs.readdirSync(EXPORTS_DIR);
-    
-    _.each(dirs,function dnodeExporter(file) {
-      var objName = file.split(".")[0];
 
-      var obj = require(EXPORTS_DIR + file);
-      myExports[objName] = obj;
-    });
+    setupMiddlewares(app);
+
+    app.listen(LISTEN_PORT);
+
+    // Add plugin exports to EXPORT_DIRS
+    plugins = fs.readdirSync(PLUGIN_DIR);
+    for(var i = 0; len = plugins.length, i < len; i++) {
+      EXPORT_DIRS.push(PLUGIN_DIR + plugins[i] + '/');
+    }
+
+    for(var i = 0; len = EXPORT_DIRS.length, i < len; i++) {
+      dirs = fs.readdirSync(EXPORT_DIRS[i]);
+
+      for (var j = 0; len = dirs.length, i < len; i++) {
+        var objName = dirs[j].split(".")[0]
+          , obj = require(EXPORT_DIRS[i] + dirs[j]);
+
+          myExports[objName] = obj;
+      }
+    }
     
     dnode(myExports).listen(app);
   }
