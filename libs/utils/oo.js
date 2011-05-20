@@ -1,4 +1,5 @@
-function __extends(child, parent) {
+
+exports.__extends = function __extends(child, parent) {
   for(var prop in parent) {
     if(typeof parent[prop] !== 'undefined') {
       child[prop] = (typeof child[prop] !== 'undefined' ? child[prop]: parent[prop]);
@@ -6,10 +7,11 @@ function __extends(child, parent) {
   }
   return child;
 };
-exports.__extends = __extends;
 
-function __deepExtends(child, parent) {
-  
+/*****************************************************************************/
+
+
+exports.__deepExtends = function __deepExtends(child, parent) { 
   for (var prop in parent) {
   
     //ignore all `undefined` prop
@@ -30,9 +32,10 @@ function __deepExtends(child, parent) {
   }
   return child;
 };
-exports.__deepExtends = __deepExtends;
 
-function inherits(child, parent) {
+/*****************************************************************************/
+
+exports.inherits = function inherits(child, parent) {
   
   ///copy all memebrs of parents to this (the child)
   __deepExtends(child, parent);
@@ -58,4 +61,11 @@ function inherits(child, parent) {
   child.prototype.__super__ = parent.prototype;
   
 };
-exports.inherits = inherits;
+
+/*****************************************************************************/
+
+exports.unimplemented = function unimplemented(name){
+  return function(){
+    throw "xxx function " + name + "() hasn't been implemented";
+  };
+};

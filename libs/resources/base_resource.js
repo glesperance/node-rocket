@@ -6,11 +6,7 @@
   * objects.
   */
 
-function unimplemented(name){
-  return function(){
-    throw "xxx function " + name + "() hasn't been implemented";
-  };
-}
+var unimplemented = require('../libs/utils/oo').unimplemented;
   
 BaseResource.prototype = {
     /**
@@ -21,18 +17,19 @@ BaseResource.prototype = {
               create the on disk db file, etc. 
      * 
      */
-    initialize: function() { /* Silence is Golden */ }
+    initialize: function initialize() { /* Silence is Golden */ }
     
     /**
-     * This function 
+     * These are you usual DB utility functions.
      */
   , create: unimplemented('create')
   , get: unimplemented('get')
   , update: unimplemented('update')
+  , destroy: unimplemented('destroy')
   , all: unimplemented('all')
 };
 
-function BaseResource(){}
+function BaseResource(){ /* silence is godlden */ }
 
 //Finally export the `BaseResource` class
 module.exports = BaseResource;
