@@ -124,7 +124,7 @@ rocket.commands = {
       if (path.existsSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"))
          || path.existsSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"))
          || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0]))
-         || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"))) {
+         || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.jade"))) {
         rocket.error("Looks like you already have that page!");
         process.exit(1);
       }
@@ -132,7 +132,7 @@ rocket.commands = {
       fs.writeFileSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"), "Put content here.");
       fs.writeFileSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"), "Put content here.");
       fs.mkdirSync(path.join(process.cwd(), "views", rocket.argv[0]), 0777);
-      fs.writeFileSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.view.jade"), "Put content here.");
+      fs.writeFileSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.jade"), "Put content here.");
       console.log("The rocket landed. Page " + rocket.argv[0] + " created.");
     }
     catch (err) {
