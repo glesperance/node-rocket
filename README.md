@@ -1,4 +1,4 @@
-# THIS IS A WORK IN PRORGESS
+# THIS IS A WORK IN PROGRESS
   node-rocket is in its early stage at the moment. This message will be removed
   when it will be suitable for *unstable but less chaotic* use.
 
