@@ -1,8 +1,11 @@
 
-exports.__extends = function __extends(child, parent) {
+exports.__extends = function __extends(child, parent, options) {
+  
+  var options = options || {};
+
   for(var prop in parent) {
     if(typeof parent[prop] !== 'undefined') {
-      child[prop] = (typeof child[prop] !== 'undefined' ? child[prop]: parent[prop]);
+      child[prop] = (!options.overwrite && typeof child[prop] !== 'undefined' ? child[prop] : parent[prop]);
     }
   }
   return child;
@@ -11,22 +14,24 @@ exports.__extends = function __extends(child, parent) {
 /*****************************************************************************/
 
 
-exports.__deepExtends = function __deepExtends(child, parent) { 
+exports.__deepExtends = function __deepExtends(child, parent, options) { 
+  
+  var options = options || {};
+
   for (var prop in parent) {
   
     //ignore all `undefined` prop
     if(typeof parent[prop] !== 'undefined') {
-    
       //if the current prop is an object, and is not `null` we recurse
       if(typeof parent[prop] === 'object' && parent[prop] !== null) {        
         child[prop] = child[prop] || {};
-        arguments.callee(child[prop], parent[prop]);
+        arguments.callee(child[prop], parent[prop], options);
       }else{
         /**
          * if the prop is *not* an object (or is null)
          * copy it in the child if it doesn't already exists
          */
-        child[prop] = (typeof child[prop] !== 'undefined' ? child[prop]: parent[prop]);
+        child[prop] = (!options.overwrite && typeof child[prop] !== 'undefined' ? child[prop]: parent[prop]);
       }
     }
   }
@@ -64,7 +69,7 @@ exports.inherits = function inherits(child, parent) {
 
 /*****************************************************************************/
 
-exports.unimplemented = function unimplemented(name){
+exports.unimplemented = function unimplemented(name) {
   return function(){
     throw "xxx function " + name + "() hasn't been implemented";
   };
