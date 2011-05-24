@@ -49,29 +49,6 @@ var factoryFunctions = {
 oo.__extends(BaseResource, factoryFunctions);
 
 /*****************************************************************************/
-/* BaseResource utility functions
- */
- 
-var utilityFunctions = {
-    getTypeFromFilename: function getTypeFromFilename_BaseResource(filename){
-        var tmp = filename.split('/');
-        
-        //extract filename
-        tmp = tmp[tmp.length - 1];
-        
-        //remove filetype
-        tmp = tmp.split('.');
-        delete tmp[tmp.length - 1];
-        tmp = tmp.join('');
-        
-        //remove suffix
-        tmp = tmp.slice(0, tmp.length - suffix.length);
-        
-        return tmp;
-      }
-  };
-
-/*****************************************************************************/
 /* Base Resource Constructor
  */
 function BaseResource(){ /* silence is golden */ }

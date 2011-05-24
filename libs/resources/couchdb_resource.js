@@ -79,8 +79,11 @@ var factoryFunctions = {
         );
       
       //Infer DB name from file name
-      var singular = getTypeFromFilename(__filename);
-      that.__db_name = lingo.en.pluralize(singular);
+      if(typeof that.type == 'undefined') {
+        throw 'xxx ERROR Model.type is undefined';
+      }
+      
+      that.__db_name = lingo.en.pluralize(that.type);
       
       //setup db object
       that.__db = this.__connection.database(that.__db_name);
