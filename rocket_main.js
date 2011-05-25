@@ -52,13 +52,13 @@ function setupControllers(app) {
     if(has_view) {
       return function(req, res) {
         var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
-        var json = methods[method]();
+        var json = methods[method](req, res);
         res.render(dir + VIEWS_DIR + name + '/' + name + '.' +  method + '.jade', _.extend(json, {controller: name}));
       };
     } else {
       return function(req, res) {
         var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
-        var json = methods[method]();
+        var json = methods[method](req, res);
 
         res.send(json);
       }
@@ -249,14 +249,15 @@ var rocket = {
       }
       
       //default configuration
-        app.configure(function() {
+      app.configure(function() {
         app.set("view engine", 'jade');
         app.set("views", app._rocket.app_dir + VIEWS_DIR);
         app.register(".jade",require('jade'));
         
-        app.use(express.bodyParser());
+        
         app.use('/static', express.static(app._rocket.app_dir + CLIENT_STATIC_DIR));
 
+         app.use(express.bodyParser());
         app.use(require('browserify')({
           base : app._rocket.app_dir + CLIENT_LIBS_DIR,
           mount : '/browserify.js',

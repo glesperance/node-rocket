@@ -173,7 +173,7 @@ var factoryFunctions = {
   , create: function create_CouchDBResource(properties, callback) {
       var _id = properties._id;
       delete properties._id;
-      this.__db.dave(properties._id, properties, callback);
+      this.__db.save(_id, properties, callback);
     }
   , save: function save_CouchDBResource(obj, callback) {
       this.__db.save(obj._id, obj._rev, obj, callback);
