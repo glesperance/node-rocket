@@ -17,11 +17,13 @@ var USE_UGLIFY_JS = false;
  */
 
   /* general dirs */
-var VIEWS_DIR       = "/views/"
+var MODELS_DIR      = "/models/"
+  , VIEWS_DIR       = "/views/"
   , CONTROLLERS_DIR = "/controllers/"
   , PLUGINS_DIR     = "/plugins/"
   , EXPORT_DIR      = "/exports/"
   , CLIENT_DIR      = "/client/"
+  , DATASOURCES_DIR  = "datasources"
   
   /* client specific dirs */
   , CLIENT_LIBS_DIR = CLIENT_DIR + "/libs/"
@@ -97,16 +99,13 @@ function setupControllers(app) {
       if(view_methods.indexOf(controller_methods[i]) !== -1) {
         method_view = true;
       }
-      console.log(name +":" + controller_methods[i] + ":" + method_view + ":" +dir);
+      
       wrapped_funcs[controller_methods[i]] = buildWrapper(name, controller_methods[i], method_view, dir);
     }
 
     if (name === 'root') {
-      console.log(wrapped_funcs);
       app.resource(wrapped_funcs);
     } else {
-    
-      console.log(wrapped_funcs);
       app.resource(name, wrapped_funcs);
     }
   }
@@ -161,8 +160,20 @@ function setupControllers(app) {
 /* Models Setup
  */  
 function setupModels(app) {
+  var models_files = fs.readdirSync(app._rocket.app_dir + MODELS_DIR);
+  
+  for(var i = 0; i < models_files.length; i++) {
+    if(models_files[i] === DATASOURCES_DIR) {
+      continue;
+    }
+    var myModel = require(app._rocket.app_dir + MODELS_DIR + models_files[i]);
+    myModel.initialize();
+  }
 }
 
+/*****************************************************************************/
+/* Compile exports
+ */ 
 function compileExports(app) {
   var dirs
     , plugins
@@ -219,6 +230,8 @@ var package_info = JSON.parse(package_JSON);
 
 var rocket = {
     version: package_info.version
+  , resources: require('./libs/resources')
+  , utils: require('./libs/utils')
   , createServer: function createServer_rocket(app_dir) {
       var app = express.createServer();
       
@@ -226,11 +239,6 @@ var rocket = {
       app._rocket.routes = [];
       
       app._rocket.app_dir = app_dir;
-      
-      //save express app references
-      //app._rocket.__super__ = {};
-      //oo.__extends(app._rocket.__super__, app);
-      
       
       //replace listen on app
       var express_listen = app.listen;
@@ -261,7 +269,7 @@ var rocket = {
       setupControllers(app);
       
       //setup models
-      //setupModels(app);
+      setupModels(app);
       
       //compile exports
       compileExports(app);

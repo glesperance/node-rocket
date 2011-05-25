@@ -5,7 +5,7 @@
   * as a reference document for those who want to build other `Resource`
   * objects.
   */
-var oo = require('../libs/utils/oo');
+var oo = require('../utils/oo');
 var unimplemented = oo.unimplemented;
 
 var suffix = '_resource';
@@ -13,7 +13,7 @@ var suffix = '_resource';
 /*****************************************************************************/
 /* Resource Prototype Functions (used to create models)
  */ 
-CouchDBResource.prototype = {
+BaseResource.prototype = {
     save: unimplemented('save_UnknownResourceInstance')
   , update: unimplemented('update_UnknownResourceInstance')
   , destroy: unimplemented('destroy_UnknownResourceInstance')

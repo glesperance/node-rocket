@@ -14,7 +14,7 @@ exports.__extends = function __extends(child, parent, options) {
 /*****************************************************************************/
 
 
-exports.__deepExtends = function __deepExtends(child, parent, options) { 
+function __deepExtends(child, parent, options) { 
   
   var options = options || {};
 
@@ -24,7 +24,7 @@ exports.__deepExtends = function __deepExtends(child, parent, options) {
     if(typeof parent[prop] !== 'undefined') {
       //if the current prop is an object, and is not `null` we recurse
       if(typeof parent[prop] === 'object' && parent[prop] !== null) {        
-        child[prop] = child[prop] || {};
+        child[prop] = child[prop] || new parent[prop].constructor();
         arguments.callee(child[prop], parent[prop], options);
       }else{
         /**
@@ -38,15 +38,17 @@ exports.__deepExtends = function __deepExtends(child, parent, options) {
   return child;
 };
 
+exports.__deepExtends = __deepExtends;
+
 /*****************************************************************************/
 
-exports.inherits = function inherits(child, parent) {
+function inherits(child, parent) {
   
   ///copy all memebrs of parents to this (the child)
   __deepExtends(child, parent);
   
   //constructor helper
-  function ctor() { 
+  function ctor() { 
     //set the constructor of the current context back to the child's
     this.constructor = child.constructor;
   }
@@ -66,6 +68,8 @@ exports.inherits = function inherits(child, parent) {
   child.prototype.__super__ = parent.prototype;
   
 };
+
+exports.inherits = inherits;
 
 /*****************************************************************************/
 
