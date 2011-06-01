@@ -14,8 +14,14 @@ var async = require('async');
 var oo = require('../utils/oo');
 var BaseResource = require('./base_resource');
 
-/*****************************************************************************/
-/* Default connection parameters
+/******************************************************************************
+ * CONSTANTS
+ */
+
+var ROCKET_NAMESPACE = 'rocket';
+
+/******************************************************************************
+ * Default connection parameters
  */
 CouchDBResource.connection = {
     host: 'localhost'
@@ -27,15 +33,56 @@ CouchDBResource.connection = {
     }
   };
 
-/*****************************************************************************/
-/* Default _design documents                                     *** SYNCD ***
+/******************************************************************************
+ * Default _design documents                                     *** SYNCD ***
  */
 CouchDBResource.ddocs = [
     { 
-      _id: '_design/app'
+      _id: '_design/rocket'
     , lists: {}
     , shows: {}
     , updates: {}
+    , validate_doc_update: function(newDoc, oldDoc, userCtx) {
+        var schema = require('rocket/schema');
+        
+        if(newDoc._deleted) {
+          return;
+        }
+                
+        for(var member in schema) {
+        
+          if(typeof schema[member] !== 'undefined' 
+          && schema[member] !== null) {
+          
+            var validator;
+            var optional;
+            
+            if(typeof schema[member] === 'string') {
+            
+              validator = require('rocket/validators/' + schema[member]) || null;
+              
+            }else if(typeof schema[member] === 'object') {
+            
+              optional = schema[member].optional;
+              validator = (schema[member].validate ? require('rocket/validators/' + schema[member].validate) : null);
+              
+            }
+            
+            if(typeof newDoc[member] !== 'undefined'
+            && newDoc[member] !== null) {
+              if(validator) {
+                validator(newDoc[member]);
+              }else{
+                continue;
+              }
+            }else if(optional){
+              continue;
+            }else{
+              throw({ invalid: member + ' can\'t be missing of null' });
+            }
+          }
+        }
+      }
     , views: {
        all: {
           map: function(doc) { emit(doc._id, doc); }
@@ -44,8 +91,8 @@ CouchDBResource.ddocs = [
     }
   ];
 
-/*****************************************************************************/
-/* Default _security document                                    *** SYNCD ***
+/******************************************************************************
+ * Default _security document                                    *** SYNCD ***
  */
 CouchDBResource._security = {
     admins: {
@@ -58,8 +105,8 @@ CouchDBResource._security = {
       }  
   };
 
-/*****************************************************************************/
-/* Resource Prototype Functions (used to create models)
+/******************************************************************************
+ * Resource Prototype Functions (used to create models)
  */
 CouchDBResource.prototype = {
     save: function save_CouchDBResourceInstance() {}
@@ -69,8 +116,8 @@ CouchDBResource.prototype = {
   , exists: function exists_CouchDBResourceInstance() {}
   };
  
-/******************************************************************************/
-/* Resource Factory/Constructor Functions
+/******************************************************************************
+ * Resource Factory/Constructor Functions
  */
 var factoryFunctions = {
     initialize: function initialize_CouchDBResource(callback) {
@@ -131,14 +178,35 @@ var factoryFunctions = {
             arguments.callee(obj[key]);
           }
         }
-      }             
+      }       
         
       function syncDoc(docObj, callback) {
+      
+        //create the `rocket` namespace in the design doc
+        docObj[ROCKET_NAMESPACE] = {};
+      
+        //add the validators to the design doc
+        docObj[ROCKET_NAMESPACE].validators = that.validators;
+        
+        //add the schema to the deisng doc
+        docObj[ROCKET_NAMESPACE].schema  = that.schema;
               
         //remove previous digest
         delete docObj.digest;
         
+        //convert all functions to strings
         fctToString(docObj);
+        
+        //convert the schema to string
+        docObj[ROCKET_NAMESPACE].schema = JSON.stringify(docObj[ROCKET_NAMESPACE].schema);
+        
+        //make the schema available through commonJS' `require`
+        docObj[ROCKET_NAMESPACE].schema = 'module.exports = ' + docObj[ROCKET_NAMESPACE].schema;
+        
+        //make all validators available through commonJS' `require`
+        for(var f in docObj[ROCKET_NAMESPACE].validators) {
+          docObj[ROCKET_NAMESPACE].validators[f] = 'module.exports = ' + docObj[ROCKET_NAMESPACE].validators[f];
+        }
         
         //docObj to a JSON string
         var docJSON = JSON.stringify(docObj);
@@ -192,8 +260,8 @@ var factoryFunctions = {
 
 oo.__extends(CouchDBResource, factoryFunctions, {overwrite: true});
 
-/*****************************************************************************/
-/* CouchDBResource's Constructor
+/******************************************************************************
+ * CouchDBResource's Constructor
  */
 function CouchDBResource() {};
 

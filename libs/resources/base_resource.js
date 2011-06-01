@@ -25,24 +25,23 @@ BaseResource.prototype = {
  * Validation functions
  *
  */
-BaseResource.validator = {
+BaseResource.validators = {
     AlphaNumeric: function(obj) {
-      var regexp = /^[A-Z0-9]$/;
-      
+    var regexp = new RegExp('^[A-Z0-9]+$', 'i');
       if(! regexp.test(obj)) {
         throw({ invalid: 'Alpha-Numeric string expected'});
       }
     }
   , Integer: function(obj) {
-      var regexp = /^[0-9]+$/;
+      var regexp = new RegExp('^[0-9]+$');
       if(! regexp.test(obj.toString())) {
         throw({ invalid: 'Integer expected'});
       }
     }
   , Email: function(obj) {
-      var regexp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i;
+      var r = new RegExp('^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}', 'i');
       
-      if(! regexp.test(obj)) {
+      if(! r.test(obj)) {
         throw({ invalid: 'The email address you entered is invalid' });
       }
     }
