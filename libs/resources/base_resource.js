@@ -10,8 +10,8 @@ var unimplemented = oo.unimplemented;
 
 var suffix = '_resource';
 
-/*****************************************************************************/
-/* Resource Prototype Functions (used to create models)
+/******************************************************************************
+ * Resource Prototype Functions (used to create models)
  */ 
 BaseResource.prototype = {
     save: unimplemented('save_UnknownResourceInstance')
@@ -21,13 +21,41 @@ BaseResource.prototype = {
   , exists: unimplemented('exists_UnknownResourceInstance')
   };
 
-/******************************************************************************/
-/* Resource Factory/Constructor Functions
+/******************************************************************************
+ * Validation functions
+ *
  */
+BaseResource.validator = {
+    AlphaNumeric: function(obj) {
+      var regexp = /^[A-Z0-9]$/;
+      
+      if(! regexp.test(obj)) {
+        throw({ invalid: 'Alpha-Numeric string expected'});
+      }
+    }
+  , Integer: function(obj) {
+      var regexp = /^[0-9]+$/;
+      if(! regexp.test(obj.toString())) {
+        throw({ invalid: 'Integer expected'});
+      }
+    }
+  , Email: function(obj) {
+      var regexp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i;
+      
+      if(! regexp.test(obj)) {
+        throw({ invalid: 'The email address you entered is invalid' });
+      }
+    }
+  , Date: function(obj) {
+    }
+  };
 
+/******************************************************************************
+ * Resource Factory/Constructor Functions
+ */
 var factoryFunctions = {
     /**
-     * This function is called when `Rocket` is started. It allows the resources
+     * This function is called when `rocket` is started. It allows the resources
      * to bootstrap/initialize their environment.
      *
      *  e.g.: Sync couchDB _design documents, create/update tables in the DB,
@@ -48,8 +76,8 @@ var factoryFunctions = {
 
 oo.__extends(BaseResource, factoryFunctions);
 
-/*****************************************************************************/
-/* Base Resource Constructor
+/******************************************************************************
+ * Base Resource Constructor
  */
 function BaseResource(){ /* silence is golden */ }
 

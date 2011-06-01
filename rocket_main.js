@@ -49,20 +49,21 @@ function setupControllers(app) {
   var top_dir = app._rocket.app_dir;
    
   function buildWrapper(name, method, has_view, dir) {
-    if(has_view) {
-      return function(req, res) {
-        var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
-        var json = methods[method](req, res);
-        res.render(dir + VIEWS_DIR + name + '/' + name + '.' +  method + '.jade', _.extend(json, {controller: name}));
-      };
-    } else {
-      return function(req, res) {
-        var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
-        var json = methods[method](req, res);
-
-        res.send(json);
-      }
-    }
+    return function(req, res) {
+      var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
+        
+      if(has_view) {
+        var oSend = res.send;
+        res.send = function(obj) {
+          obj = obj || {};
+          
+          res.send = oSend;
+          
+          res.render(dir + VIEWS_DIR + name + '/' + name + '.' +  method + '.jade', _.extend(obj, {controller: name}));
+        };
+      }    
+      methods[method](req, res);
+    };
   }
 
   /**
