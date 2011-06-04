@@ -78,7 +78,7 @@ CouchDBResource.ddocs = [
             }else if(optional){
               continue;
             }else{
-              throw({ invalid: member + ' can\'t be missing of null' });
+              throw({ invalid: member + ' can\'t be missing or null' });
             }
           }
         }

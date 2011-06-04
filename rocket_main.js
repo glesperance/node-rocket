@@ -33,8 +33,8 @@ var MODELS_DIR      = "/models/"
   , CONTROLLER_SUFFIX = "_controller"
   ;
 
-/*****************************************************************************/
-/* Controllers Setup
+/******************************************************************************
+ * Controllers Setup
  */
 function setupControllers(app) {
   /**
@@ -52,7 +52,7 @@ function setupControllers(app) {
     return function(req, res) {
       var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
         
-      if(has_view) {
+      if(!req.xhr && has_view) {
         var oSend = res.send;
         res.send = function(obj) {
           obj = obj || {};
@@ -157,8 +157,8 @@ function setupControllers(app) {
   init();
 }
     
-/*****************************************************************************/
-/* Models Setup
+/******************************************************************************
+ * Models Setup
  */  
 function setupModels(app) {
   var models_files = fs.readdirSync(app._rocket.app_dir + MODELS_DIR);
@@ -172,8 +172,8 @@ function setupModels(app) {
   }
 }
 
-/*****************************************************************************/
-/* Compile exports
+/******************************************************************************
+ * Compile exports
  */ 
 function compileExports(app) {
   var dirs
@@ -223,8 +223,8 @@ function uglifyFilter(orig_code) {
   return pro.gen_code(ast);       // compressed code here
 };
 
-/*****************************************************************************/
-/* EXPORTS
+/******************************************************************************
+ * EXPORTS
  */
 var package_JSON = fs.readFileSync(__dirname + '/package.json', 'utf8'); 
 var package_info = JSON.parse(package_JSON);
@@ -258,7 +258,7 @@ var rocket = {
         
         app.use('/static', express.static(app._rocket.app_dir + CLIENT_STATIC_DIR));
 
-         app.use(express.bodyParser());
+        app.use(express.bodyParser());
         app.use(require('browserify')({
           base : app._rocket.app_dir + CLIENT_LIBS_DIR,
           mount : '/browserify.js',
