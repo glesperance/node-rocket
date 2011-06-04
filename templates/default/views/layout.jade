@@ -45,10 +45,10 @@ body
   script(src="/browserify.js")
 
   !="<script>"
-  !="var boot_options, Bootstraper = require('./bootstrapers/" + controller + "_bootstraper');"
+  !="var boot_options, Bootstrapper = require('./bootstrappers/" + controller + "_bootstrapper');"
   -if (typeof boot_options != 'undefined' && boot_options != null)
     !="boot_options = " + JSON.stringify(boot_options) + ";"
-  !="Bootstraper.bootstrap(boot_options);"
+  !="Bootstrapper.bootstrap(boot_options);"
   !="</script>"
 
   /if lt IE 7
