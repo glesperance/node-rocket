@@ -23,17 +23,16 @@ BaseResource.prototype = {
 
 /******************************************************************************
  * Validation functions
- *
  */
 BaseResource.validators = {
     AlphaNumeric: function(obj) {
-    var regexp = new RegExp('^[A-Z0-9]+$', 'i');
+      var regexp = new RegExp('^[A-Z0-9]+$', 'i');
       if(! regexp.test(obj)) {
         throw({ invalid: 'Alpha-Numeric string expected'});
       }
     }
   , Integer: function(obj) {
-      var regexp = new RegExp('^[0-9]+$');
+      var regexp = new RegExp('^(-)?[0-9]+$');
       if(! regexp.test(obj.toString())) {
         throw({ invalid: 'Integer expected'});
       }
@@ -58,7 +57,7 @@ var factoryFunctions = {
      * to bootstrap/initialize their environment.
      *
      *  e.g.: Sync couchDB _design documents, create/update tables in the DB,
-              create the on disk db file, etc. 
+     *        create the on disk db file, etc. 
      * 
      */
     initialize: function initialize() { /* Silence is Golden */ }
@@ -66,11 +65,11 @@ var factoryFunctions = {
     /**
      * These are your usual DB utility functions.
      */
-  , create: unimplemented('create_UnknownResource')
-  , get: unimplemented('get_UnknownResource')
-  , update: unimplemented('update_UnknownResource')
-  , destroy: unimplemented('destroy_UnknownResource')
-  , all: unimplemented('all_UnknownResource')
+  , create: unimplemented('UnknownResource.create')
+  , get: unimplemented('UnknownResource.get')
+  , update: unimplemented('UnknownResource.update')
+  , destroy: unimplemented('UnknownResource.destroy')
+  , all: unimplemented('UnknownResource.all')
   };
 
 oo.__extends(BaseResource, factoryFunctions);
