@@ -21,7 +21,7 @@ module.exports = {
         
         //remove suffix
         if( tmp.slice(tmp.length - suffix.length) !== suffix){
-          throw 'xxx ERROR filename hasn\'t the proper suffix { filename: "' + filename + '", suffix: "' + suffix + '"Ê}';
+          throw 'xxx ERROR filename hasn\'t the proper suffix { filename: "' + filename + '", suffix: "' + suffix + '"}';
         }
         tmp = tmp.slice(0, tmp.length - suffix.length);
         
