@@ -131,11 +131,11 @@ var factoryFunctions = {
         );
       
       //Infer DB name from file name
-      if(typeof that.type == 'undefined') {
+      if(typeof that.name == 'undefined') {
         throw 'xxx ERROR Model.type is undefined';
       }
       
-      that.__db_name = lingo.en.pluralize(that.type).toLowerCase();
+      that.__db_name = lingo.en.pluralize(that.name).toLowerCase();
       
       //setup db object
       that.__db = this.__connection.database(that.__db_name);
