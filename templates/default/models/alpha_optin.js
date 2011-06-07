@@ -21,7 +21,7 @@ function AlphaOptin() {
 
 }
 
-AlphaOptin.type = 'AlphaOptin';
+AlphaOptin.name = 'AlphaOptin';
 
 oo.inherits(AlphaOptin, CouchDBResource);
 
