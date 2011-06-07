@@ -17,13 +17,13 @@ var USE_UGLIFY_JS = false;
  */
 
   /* general dirs */
-var MODELS_DIR      = "/models/"
-  , VIEWS_DIR       = "/views/"
-  , CONTROLLERS_DIR = "/controllers/"
-  , PLUGINS_DIR     = "/plugins/"
-  , EXPORT_DIR      = "/exports/"
-  , CLIENT_DIR      = "/client/"
-  , DATASOURCES_DIR  = "datasources"
+var MODELS_DIR        = "/models/"
+  , VIEWS_DIR         = "/views/"
+  , CONTROLLERS_DIR   = "/controllers/"
+  , PLUGINS_DIR       = "/plugins/"
+  , EXPORT_DIR        = "/exports/"
+  , CLIENT_DIR        = "/client/"
+  , DATASOURCES_DIR   = "datasources"
   
   /* client specific dirs */
   , CLIENT_LIBS_DIR = CLIENT_DIR + "/libs/"
