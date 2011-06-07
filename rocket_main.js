@@ -255,9 +255,10 @@ var rocket = {
         app.set("views", app._rocket.app_dir + VIEWS_DIR);
         app.register(".jade",require('jade'));
         
+        app.use(express.methodOverride());
         
         app.use('/static', express.static(app._rocket.app_dir + CLIENT_STATIC_DIR));
-
+        
         app.use(express.bodyParser());
         app.use(require('browserify')({
           base : app._rocket.app_dir + CLIENT_LIBS_DIR,
