@@ -1,14 +1,24 @@
 
 exports.__extends = function __extends(child, parent, options) {
   
-  var options = options || {};
+  var options = options || {}
+    , child_copy = undefined;
 
   for(var prop in parent) {
-    if(typeof parent[prop] !== 'undefined') {
-      child[prop] = (!options.overwrite && typeof child[prop] !== 'undefined' ? child[prop] : parent[prop]);
+    if(typeof parent[prop] !== 'undefined' && parent[prop] !== child[prop]) {
+      var dst = undefined;
+      
+      if(options.copyOnWrite) {
+        child_copy = child_copy || __extends({}, child);
+        dst = child_copy
+      }else{
+        dst = child;
+      }
+      
+      dst[prop] = (!options.overwrite && typeof dst[prop] !== 'undefined' ? dst[prop] : parent[prop]);
     }
   }
-  return child;
+  return child_copy || child;
 };
 
 /*****************************************************************************/
@@ -16,26 +26,37 @@ exports.__extends = function __extends(child, parent, options) {
 
 function __deepExtends(child, parent, options) { 
   
-  var options = options || {};
+  var options = options || {}
+    , child_copy = undefined
+    ;
 
   for (var prop in parent) {
   
-    //ignore all `undefined` prop
-    if(typeof parent[prop] !== 'undefined') {
+    //ignore all `undefined` and equal props
+    if(typeof parent[prop] !== 'undefined' && parent[prop] !== child[prop] ) {
+      var dst;
+      
+      if(options.copyOnWrite) {
+        child_copy = child_copy || __extends({}, child);
+        dst = child_copy;
+      }else{
+        dst = child;
+      }
+    
       //if the current prop is an object, and is not `null` we recurse
       if(typeof parent[prop] === 'object' && parent[prop] !== null) {        
-        child[prop] = child[prop] || new parent[prop].constructor();
-        arguments.callee(child[prop], parent[prop], options);
+        dst[prop] = dst[prop] || new parent[prop].constructor();
+        dst[prop] = arguments.callee(dst[prop], parent[prop], options);
       }else{
         /**
          * if the prop is *not* an object (or is null)
          * copy it in the child if it doesn't already exists
          */
-        child[prop] = (!options.overwrite && typeof child[prop] !== 'undefined' ? child[prop]: parent[prop]);
+        dst[prop] = (!options.overwrite && typeof dst[prop] !== 'undefined' ? dst[prop] : parent[prop]);
       }
     }
   }
-  return child;
+  return child_copy || child;
 };
 
 exports.__deepExtends = __deepExtends;
