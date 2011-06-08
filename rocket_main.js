@@ -59,7 +59,7 @@ function setupControllers(app) {
    
   function buildWrapper(name, method, has_view, dir) {
     return function(req, res) {
-      var methods = require(path.join(CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX));
+      var methods = require(path.join(dir, CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX));
         
       if(!req.xhr && has_view) {
         var oSend = res.send;
@@ -129,12 +129,32 @@ function setupControllers(app) {
    * Gets the name of each controller and searches through the view folder
    * to see wether it finds a corresponding view
    */
-  function searchFolders(dir) {
-    var controllers = fs.readdirSync(path.join(dir, CONTROLLERS_DIR_NAME))
-      , views = fs.readdirSync(path.join(dir, VIEWS_DIR_NAME))
+  function searchFolders(dir) {    
+    var controllers = []
+      , views = []
       , has_view = false
       , split = []
       ;
+  
+    try{
+      controllers = fs.readdirSync(path.join(dir, CONTROLLERS_DIR_NAME));
+    }catch(err){
+      if(err.code === 'ENOENT') {
+        console.log(('!!! WARNING No `' + CONTROLLERS_DIR_NAME + '` dir found in [' + dir + ']. Skipping exports...').yellow);
+      }else{
+        throw(err);
+      }
+    }
+    
+    try{
+      views = fs.readdirSync(path.join(dir, VIEWS_DIR_NAME));
+    }catch(err){
+      if(err.code === 'ENOENT') {
+        console.log(('!!! WARNING No `' + VIEWS_DIR_NAME + '` dir found in [' + dir + ']. Skipping exports...').yellow);
+      }else{
+        throw(err);
+      }
+    }
 
     for(var i = 0; i < views.length; i++) {
       views[i] = extractName(views[i]);
@@ -309,10 +329,9 @@ var rocket = {
         app.use(express.methodOverride());
         
         app.use('/static', express.static(path.join(app._rocket.app_dir, CLIENT_STATIC_DIR)));
-        
         app.use(express.bodyParser());
         app.use(require('browserify')({
-          base : path.join(app._rocket.app_dir, CLIENT_LIBS_DIR),
+          base : [path.join(app._rocket.app_dir, CLIENT_LIBS_DIR)/*, path.join(app._rocket.app_dir, PLUGINS_DIR_NAME, 'test', 'client', 'libs')*/],
           mount : '/browserify.js',
           filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined),
           require: ['dnode']
