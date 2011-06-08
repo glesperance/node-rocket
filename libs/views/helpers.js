@@ -14,6 +14,7 @@ var SELECT_DEF          : { type: 'select', container: true }
   , HIDDEN_FIELD_DEF    : { type: 'input', attributes: { type: 'hidden' } }
   , RADIO_BUTTON_DEF    : { type: 'input', attributes: { type: 'radio' } }
   , CHECK_BOX_DEF       : { type: 'input', attributes: { type: 'checkbox' } }
+  , FILE_FIELD_DEF      : { type: 'input', attributes: { type: 'file'} }
   , SUBMIT_DEF          : { type: 'input', noName: true, attributes: { type: 'submit', name: 'commit' } }
   };
 
@@ -101,6 +102,8 @@ var formTags = {
   , hidden_field_tag    : createTagHelper(HIDDEN_FIELD_DEF)
   , radio_button_tag    : createTagHelper(RADIO_BUTTON_DEF)
   , check_box_tag       : createTagHelper(CHECK_BOX_DEF)
+  , file_field_tag      : createTagHelper(FILE_FIELD_DEF)
+  , submit_tag          : createTagHelper(SUBMIT_DEF)
   , options_for_select  : function options_for_select(options, selected_idx) {
       var html = '';
       for(var i = 0, len = options.length; i < len; i++) {
@@ -115,7 +118,6 @@ var formTags = {
       }
       return html;
     }
-  , submit_tag          : createTagHelper(SUBMIT_DEF)
   };
   
 /******************************************************************************
@@ -154,11 +156,12 @@ var createModelFormTags = function(model) {
       select          : function(){ return (createTaghelper(oo.__extends( SELECT_DEF          , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
     , label           : function(){ return (createTagHelper(oo.__extends( LABEL_DEF           , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
     , text_field      : function(){ return (createTagHelper(oo.__extends( TEXT_FIELD_DEF      , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
-    , text_area       : function(){ return (createTagHelper(oo.__extends( TEXT_AREA_DEF       , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments);}
-    , password_field  : function(){ return (createTagHelper(oo.__extends( PASSWORD_FIELD_DEF  , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments);}
-    , hidden_field    : function(){ return (createTagHelper(oo.__extends( HIDDEN_FIELD_DEF    , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments);}
-    , radio_button    : function(){ return (createTagHelper(oo.__extends( RADIO_BUTTON_DEF    , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments);}
-    , check_box       : function(){ return (createTagHelper(oo.__extends( CHECK_BOX_DEF       , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments);}
+    , text_area       : function(){ return (createTagHelper(oo.__extends( TEXT_AREA_DEF       , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
+    , password_field  : function(){ return (createTagHelper(oo.__extends( PASSWORD_FIELD_DEF  , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
+    , hidden_field    : function(){ return (createTagHelper(oo.__extends( HIDDEN_FIELD_DEF    , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
+    , radio_button    : function(){ return (createTagHelper(oo.__extends( RADIO_BUTTON_DEF    , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
+    , check_box       : function(){ return (createTagHelper(oo.__extends( CHECK_BOX_DEF       , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
+    , file_field      : function(){ return (createTagHelper(oo.__extends( FILE_FIELD_DEF      , {model_name: model.name}  , {copyOnWrite: true}))).apply(this, arguments); }
     , input           : function input_form_for_helper(name, attributes) {
         var schema = model.schema
           , field_type = undefined
