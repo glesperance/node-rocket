@@ -19,7 +19,6 @@
       "express" : ">= 1.0.7"
     , "semver" : ">= 1.0.5"
     , "nopt" : ">= 1.0.5"
-    , "abbrev" : ">= 1.0.3"
     , "jade" : ">= 0.6.3"
     , "underscore" : ">= 1.1.4"
     , "dnode" : ">= 0.6.8"
@@ -27,9 +26,9 @@
     , "uglify-js" : ">= 1.0.1"
     , "coffee-script" : ">= 1.0.1"
     , "express-resource" : ">= 0.2.0"
-    , "watch" : ">= 0.3.2"
     , "lingo" : ">= 0.0.4"
     , "async" : ">= 0.1.9"
+    , "colors" : ">= 0.5.0"
   }
 , "licenses" :
     [{

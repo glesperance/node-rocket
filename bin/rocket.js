@@ -22,10 +22,9 @@
 */
 ;(function () { // wrapper in case we're in module_context mode
 var path = require("path")
-  , abbrev = require("abbrev")
   , semver = require("semver")
   , nopt = require("nopt")
-  , fs = require("../libs/utils/graceful-fs")
+  , fs = require("fs")
   , knownOpts = { "help" : Boolean
                 , "verbose" : Boolean
                 , "version" : Boolean
