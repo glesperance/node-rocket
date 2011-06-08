@@ -166,6 +166,8 @@ var factoryFunctions = {
         
       function syncDoc(docObj, callback) {
       
+        
+      
         //create the `rocket` namespace in the design doc
         docObj[ROCKET_NAMESPACE] = {};
       
@@ -209,6 +211,7 @@ var factoryFunctions = {
             if(err.error === 'not_found'){
               that.__db.save(docObj._id, docObj, callback);
             }else{
+              console.log(('xxx [CouchDBResource] ERROR ' + err).red);
               callback(err);
             }
           }else{
