@@ -211,7 +211,7 @@ var factoryFunctions = {
             if(err.error === 'not_found'){
               that.__db.save(docObj._id, docObj, callback);
             }else{
-              console.log(('xxx [CouchDBResource] ERROR ' + err).red);
+              console.log(('xxx [CouchDBResource] ERROR id: ' + docObj._id + ' ' + require('util').inspect(err)).red);
               callback(err);
             }
           }else{
