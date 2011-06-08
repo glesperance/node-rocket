@@ -32,6 +32,12 @@ var MODELS_DIR        = "/models/"
   /* namespace constants */
   , CONTROLLER_SUFFIX = "_controller"
   ;
+  
+/******************************************************************************
+ * GLOBALS
+ */
+ 
+var missing = [];
 
 /******************************************************************************
  * Controllers Setup
@@ -76,6 +82,7 @@ function setupControllers(app) {
    */
   function setController(name, has_view, dir) {
     var wrapped_funcs = {}
+      , view_methods_files = []
       , view_methods = []
       , split = []
       , controller_methods = _.functions(require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX));
@@ -86,11 +93,18 @@ function setupControllers(app) {
 
     if (has_view) {
       // Get the methods for which views exist
-      view_methods = fs.readdirSync(dir + VIEWS_DIR + name);
+      try {
+        view_methods_files = fs.readdirSync(dir + VIEWS_DIR + name);
+      }catch(err){
+        console.log(err);
+        throw(err);
+      }
 
-      for(var i = 0; i < view_methods.length; i++) {
-        split = view_methods[i].split('.');
-        view_methods[i] = split[split.length - 2];
+      for(var i = 0; i < view_methods_files.length; i++) {
+        split = view_methods_files[i].split('.');
+        if(split[0] === name) {
+          view_methods.push(split[split.length - 2]);
+        }
       }
     }
 
@@ -143,15 +157,26 @@ function setupControllers(app) {
    * views then running through the plugin dirs
    */
   function init() {
-    var plugins = fs.readdirSync(top_dir + PLUGINS_DIR);
-
+  
+    var plugins = {};
+  
+    try{
+      plugins = fs.readdirSync(top_dir + PLUGINS_DIR);
+    }catch(err){
+        if(err.code === 'ENOENT') {
+          console.log('!!! No `plugins` dir found in project. Skipping plugins...');
+          missing.push(PLUGINS_DIR);
+        }else{
+          throw(err);
+        }
+    }
+    
     searchFolders(top_dir);
 
     for(var i = 0; i < plugins.length; i++) {
       searchFolders(top_dir + PLUGINS_DIR + plugins[i]);
     }
 
-    //callback(app);
   }
 
   init();
@@ -182,9 +207,20 @@ function compileExports(app) {
     , myExports = {};
   
   // Add plugin exports to EXPORT_DIRS
-  plugins = fs.readdirSync(app._rocket.app_dir + PLUGINS_DIR);
-  for(var i = 0; i < plugins.length; i++) {
-    exported_dirs[plugins[i]] = app._rocket.app_dir + PLUGINS_DIR + plugins[i] + '/' + EXPORT_DIR;
+  if(missing.indexOf(PLUGINS_DIR) === -1){
+    try{
+      plugins = fs.readdirSync(app._rocket.app_dir + PLUGINS_DIR);
+      for(var i = 0; i < plugins.length; i++) {
+        exported_dirs[plugins[i]] = app._rocket.app_dir + PLUGINS_DIR + plugins[i] + '/' + EXPORT_DIR;
+      }
+    }catch(err){
+      if(err.code == 'ENOENT') {
+            console.log('!!! No `plugins` dir found in project. Skipping plugin exports...');
+            missing.push(PLUGINS_DIR);
+      }else{
+        throw(err);
+      }
+    }
   }
   
   for(var export_name in exported_dirs) {
@@ -197,17 +233,29 @@ function compileExports(app) {
       container = myExports[export_name];
     }
     
-    dirs = fs.readdirSync(exported_dirs[export_name]); 
+    try{
+      dirs = fs.readdirSync(exported_dirs[export_name]); 
     
-    for (var j = 0; j < dirs.length; j++) {
-      var objName = dirs[j].split(".")[0]
-        , obj = require(exported_dirs[export_name] + dirs[j]);
-  
-        container[objName] = obj;
+      for (var j = 0; j < dirs.length; j++) {
+        var objName = dirs[j].split(".")[0]
+          , obj = require(exported_dirs[export_name] + dirs[j]);
+    
+          container[objName] = obj;
+      }      
+    }catch(err){
+      if(err.code === 'ENOENT') {
+        console.log('!!! No `exports` dir found in project. Skipping...');
+        missing.push(EXPORT_DIR);
+      }else{
+        throw(err);
+      }
     }
   }
   
-  app._rocket.dnode = dnode(myExports);
+  if(myExports.length > 0) {
+    app._rocket.dnode = dnode(myExports);
+  }
+  
 }
 
 /******************************************************************************
@@ -245,7 +293,9 @@ var rocket = {
       var express_listen = app.listen;
       app.listen = function () {
         var ret = express_listen.apply(this, arguments);
-        app._rocket.dnode.listen(app);
+        if(missing.indexOf(EXPORT_DIR) === -1 ) {
+          app._rocket.dnode.listen(app);
+        }
         return ret;
       }
       
