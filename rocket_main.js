@@ -1,9 +1,11 @@
-var fs = require("fs")
-  , _ = require("underscore")
-  , express = require("express")
-  , Resource = require("express-resource")
-  , dnode = require("dnode")
-  , colors = require('colors');
+var fs        = require("fs")
+  , _         = require("underscore")
+  , express   = require("express")
+  , Resource  = require("express-resource")
+  , dnode     = require("dnode")
+  , colors    = require('colors')
+  , path      = require('path')
+  ;
   
 var extractName = require('./libs/utils/namespace').extractName
   , oo = require('./libs/utils/oo');
@@ -18,20 +20,20 @@ var USE_UGLIFY_JS = false;
  */
 
   /* general dirs */
-var MODELS_DIR        = "/models/"
-  , VIEWS_DIR         = "/views/"
-  , CONTROLLERS_DIR   = "/controllers/"
-  , PLUGINS_DIR       = "/plugins/"
-  , EXPORT_DIR        = "/exports/"
-  , CLIENT_DIR        = "/client/"
-  , DATASOURCES_DIR   = "datasources"
+var MODELS_DIR_NAME        = 'models'
+  , VIEWS_DIR_NAME         = 'views'
+  , CONTROLLERS_DIR_NAME   = 'controllers'
+  , PLUGINS_DIR_NAME       = 'plugins'
+  , EXPORT_DIR_NAME        = 'exports'
+  , CLIENT_DIR_NAME        = 'client'
+  , DATASOURCES_DIR_NAME   = 'datasources'
   
   /* client specific dirs */
-  , CLIENT_LIBS_DIR = CLIENT_DIR + "/libs/"
-  , CLIENT_STATIC_DIR = CLIENT_DIR + "/static/"
+  , CLIENT_LIBS_DIR = path.join(CLIENT_DIR_NAME, 'libs')
+  , CLIENT_STATIC_DIR = path.join(CLIENT_DIR_NAME, 'static')
   
   /* namespace constants */
-  , CONTROLLER_SUFFIX = "_controller"
+  , CONTROLLER_SUFFIX = '_controller'
   ;
   
 /******************************************************************************
@@ -57,7 +59,7 @@ function setupControllers(app) {
    
   function buildWrapper(name, method, has_view, dir) {
     return function(req, res) {
-      var methods = require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX);
+      var methods = require(path.join(CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX));
         
       if(!req.xhr && has_view) {
         var oSend = res.send;
@@ -66,7 +68,7 @@ function setupControllers(app) {
           
           res.send = oSend;
           
-          res.render(dir + VIEWS_DIR + name + '/' + name + '.' +  method + '.jade', _.extend(obj, {controller: name}));
+          res.render(path.join(dir, VIEWS_DIR_NAME, name,  [name, method, 'jade'].join('.') ), _.extend(obj, {controller: name}) );
         };
       }    
       methods[method](req, res);
@@ -86,7 +88,8 @@ function setupControllers(app) {
       , view_methods_files = []
       , view_methods = []
       , split = []
-      , controller_methods = _.functions(require(dir + CONTROLLERS_DIR + name + CONTROLLER_SUFFIX));
+      , controller_methods = _.functions(require(path.join(dir, CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX)))
+      ;
 
     if (app._rocket.routes.indexOf(name) !== -1) {
       throw("Route already in use");
@@ -94,7 +97,7 @@ function setupControllers(app) {
 
     if (has_view) {
       // Get the methods for which views exist
-      view_methods_files = fs.readdirSync(dir + VIEWS_DIR + name);
+      view_methods_files = fs.readdirSync(path.join(dir, VIEWS_DIR_NAME, name));
       
 
       for(var i = 0; i < view_methods_files.length; i++) {
@@ -127,10 +130,11 @@ function setupControllers(app) {
    * to see wether it finds a corresponding view
    */
   function searchFolders(dir) {
-    var controllers = fs.readdirSync(dir + CONTROLLERS_DIR)
-      , views = fs.readdirSync(dir + VIEWS_DIR)
+    var controllers = fs.readdirSync(path.join(dir, CONTROLLERS_DIR_NAME))
+      , views = fs.readdirSync(path.join(dir, VIEWS_DIR_NAME))
       , has_view = false
-      , split = [];
+      , split = []
+      ;
 
     for(var i = 0; i < views.length; i++) {
       views[i] = extractName(views[i]);
@@ -158,11 +162,11 @@ function setupControllers(app) {
     var plugins = {};
   
     try{
-      plugins = fs.readdirSync(top_dir + PLUGINS_DIR);
+      plugins = fs.readdirSync(path.join(top_dir, PLUGINS_DIR_NAME));
     }catch(err){
         if(err.code === 'ENOENT') {
           console.log('!!! WARNING No `plugins` dir found in project. Skipping plugins...'.yellow);
-          missing.push(PLUGINS_DIR);
+          missing.push(PLUGINS_DIR_NAME);
         }else{
           throw(err);
         }
@@ -171,7 +175,7 @@ function setupControllers(app) {
     searchFolders(top_dir);
 
     for(var i = 0; i < plugins.length; i++) {
-      searchFolders(top_dir + PLUGINS_DIR + plugins[i]);
+      searchFolders(path.join(top_dir, PLUGINS_DIR_NAME, plugins[i]));
     }
 
   }
@@ -183,13 +187,13 @@ function setupControllers(app) {
  * Models Setup
  */  
 function setupModels(app) {
-  var models_files = fs.readdirSync(app._rocket.app_dir + MODELS_DIR);
+  var models_files = fs.readdirSync(path.join(app._rocket.app_dir, MODELS_DIR_NAME));
   
   for(var i = 0; i < models_files.length; i++) {
-    if(models_files[i] === DATASOURCES_DIR) {
+    if(models_files[i] === DATASOURCES_DIR_NAME) {
       continue;
     }
-    var myModel = require(app._rocket.app_dir + MODELS_DIR + models_files[i]);
+    var myModel = require(path.join(app._rocket.app_dir, MODELS_DIR_NAME, models_files[i]));
     myModel.initialize();
   }
 }
@@ -200,20 +204,20 @@ function setupModels(app) {
 function compileExports(app) {
   var dirs
     , plugins
-    , exported_dirs = {'': app._rocket.app_dir + EXPORT_DIR}
+    , exported_dirs = {'': path.join(app._rocket.app_dir, EXPORT_DIR_NAME)}
     , myExports = {};
   
   // Add plugin exports to EXPORT_DIRS
-  if(missing.indexOf(PLUGINS_DIR) === -1){
+  if(missing.indexOf(PLUGINS_DIR_NAME) === -1){
     try{
-      plugins = fs.readdirSync(app._rocket.app_dir + PLUGINS_DIR);
+      plugins = fs.readdirSync(path.join(app._rocket.app_dir, PLUGINS_DIR_NAME));
       for(var i = 0; i < plugins.length; i++) {
-        exported_dirs[plugins[i]] = app._rocket.app_dir + PLUGINS_DIR + plugins[i] + '/' + EXPORT_DIR;
+        exported_dirs[plugins[i]] = path.join(app._rocket.app_dir, PLUGINS_DIR_NAME, plugins[i], EXPORT_DIR_NAME);
       }
     }catch(err){
       if(err.code == 'ENOENT') {
             console.log('!!! WARNING No `plugins` dir found in project. Skipping plugin exports...'.yellow);
-            missing.push(PLUGINS_DIR);
+            missing.push(PLUGINS_DIR_NAME);
       }else{
         throw(err);
       }
@@ -242,7 +246,7 @@ function compileExports(app) {
     }catch(err){
       if(err.code === 'ENOENT') {
         console.log('!!! WARNING No `exports` dir found in project. Skipping exports...'.yellow);
-        missing.push(EXPORT_DIR);
+        missing.push(EXPORT_DIR_NAME);
       }else{
         throw(err);
       }
@@ -271,7 +275,7 @@ function uglifyFilter(orig_code) {
 /******************************************************************************
  * EXPORTS
  */
-var package_JSON = fs.readFileSync(__dirname + '/package.json', 'utf8'); 
+var package_JSON = fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'); 
 var package_info = JSON.parse(package_JSON);
 
 var rocket = {
@@ -290,7 +294,7 @@ var rocket = {
       var express_listen = app.listen;
       app.listen = function () {
         var ret = express_listen.apply(this, arguments);
-        if(missing.indexOf(EXPORT_DIR) === -1 ) {
+        if(missing.indexOf(EXPORT_DIR_NAME) === -1 ) {
           app._rocket.dnode.listen(app);
         }
         return ret;
@@ -299,16 +303,16 @@ var rocket = {
       //default configuration
       app.configure(function() {
         app.set("view engine", 'jade');
-        app.set("views", app._rocket.app_dir + VIEWS_DIR);
+        app.set("views", path.join(app._rocket.app_dir, VIEWS_DIR_NAME));
         app.register(".jade",require('jade'));
         
         app.use(express.methodOverride());
         
-        app.use('/static', express.static(app._rocket.app_dir + CLIENT_STATIC_DIR));
+        app.use('/static', express.static(path.join(app._rocket.app_dir, CLIENT_STATIC_DIR)));
         
         app.use(express.bodyParser());
         app.use(require('browserify')({
-          base : app._rocket.app_dir + CLIENT_LIBS_DIR,
+          base : path.join(app._rocket.app_dir, CLIENT_LIBS_DIR),
           mount : '/browserify.js',
           filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined),
           require: ['dnode']
