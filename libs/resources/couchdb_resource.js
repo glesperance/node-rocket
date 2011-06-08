@@ -147,27 +147,11 @@ var factoryFunctions = {
           [function(callback) {
               async.forEach(that.ddocs, syncDoc, callback);
             }
-       /* , function(callback) {
-              that.get('_security', syncSecurity);
-            }*/
+          , function(callback) {
+              that.__db._save('_security', false, that._security, callback);
+            }
           ]
         , callback);
-        
-      /*function syncSecurity(err, doc) {
-          if(err) {
-            if(err.error === 'not_found') {
-              that.__db.save('_security'
-                            , that._security
-                            , callback);
-            }else{
-              callback(err);
-            }
-          }else{
-            //oo.__extends(doc, that._security, {overwrite: true});
-             console.log('sec: ' + that._security.toString());
-            that.__db.save('_security', that._security, callback);
-          }
-        };*/
         
       
       function fctToString(obj) {
