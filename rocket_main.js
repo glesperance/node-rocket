@@ -2,7 +2,8 @@ var fs = require("fs")
   , _ = require("underscore")
   , express = require("express")
   , Resource = require("express-resource")
-  , dnode = require("dnode");
+  , dnode = require("dnode")
+  , colors = require('colors');
   
 var extractName = require('./libs/utils/namespace').extractName
   , oo = require('./libs/utils/oo');
@@ -93,12 +94,8 @@ function setupControllers(app) {
 
     if (has_view) {
       // Get the methods for which views exist
-      try {
-        view_methods_files = fs.readdirSync(dir + VIEWS_DIR + name);
-      }catch(err){
-        console.log(err);
-        throw(err);
-      }
+      view_methods_files = fs.readdirSync(dir + VIEWS_DIR + name);
+      
 
       for(var i = 0; i < view_methods_files.length; i++) {
         split = view_methods_files[i].split('.');
@@ -164,7 +161,7 @@ function setupControllers(app) {
       plugins = fs.readdirSync(top_dir + PLUGINS_DIR);
     }catch(err){
         if(err.code === 'ENOENT') {
-          console.log('!!! No `plugins` dir found in project. Skipping plugins...');
+          console.log('!!! WARNING No `plugins` dir found in project. Skipping plugins...'.yellow);
           missing.push(PLUGINS_DIR);
         }else{
           throw(err);
@@ -215,7 +212,7 @@ function compileExports(app) {
       }
     }catch(err){
       if(err.code == 'ENOENT') {
-            console.log('!!! No `plugins` dir found in project. Skipping plugin exports...');
+            console.log('!!! WARNING No `plugins` dir found in project. Skipping plugin exports...'.yellow);
             missing.push(PLUGINS_DIR);
       }else{
         throw(err);
@@ -244,7 +241,7 @@ function compileExports(app) {
       }      
     }catch(err){
       if(err.code === 'ENOENT') {
-        console.log('!!! No `exports` dir found in project. Skipping...');
+        console.log('!!! WARNING No `exports` dir found in project. Skipping exports...'.yellow);
         missing.push(EXPORT_DIR);
       }else{
         throw(err);
