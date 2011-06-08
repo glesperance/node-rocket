@@ -331,10 +331,10 @@ var rocket = {
         app.use('/static', express.static(path.join(app._rocket.app_dir, CLIENT_STATIC_DIR)));
         app.use(express.bodyParser());
         app.use(require('browserify')({
-          base : [path.join(app._rocket.app_dir, CLIENT_LIBS_DIR)/*, path.join(app._rocket.app_dir, PLUGINS_DIR_NAME, 'test', 'client', 'libs')*/],
-          mount : '/browserify.js',
-          filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined),
-          require: ['dnode']
+            base : [path.join(app._rocket.app_dir, CLIENT_LIBS_DIR)]
+          , mount : '/browserify.js'
+          , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
+          , require: ['dnode']
           }));
       });
       
