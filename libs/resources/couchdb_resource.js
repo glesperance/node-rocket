@@ -4,15 +4,15 @@
  * CouchDB's power in rocket.
  */
 
-var crypto = require('crypto');
-var _ = require('underscore');
-var lingo = require('lingo');
-var cradle = require('cradle');
-var watch  = require('watch');
-var async = require('async');
+var crypto = require('crypto')
+  , _ = require('underscore')
+  , lingo = require('lingo')
+  , cradle = require('cradle')
+  , async = require('async')
+  ;
  
-var oo = require('../utils/oo');
-var BaseResource = require('./base_resource');
+var oo = require('../utils/oo')
+  , BaseResource = require('./base_resource');
 
 /******************************************************************************
  * CONSTANTS
