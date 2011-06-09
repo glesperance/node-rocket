@@ -8,7 +8,8 @@ var fs        = require("fs")
   ;
   
 var extractName = require('./libs/utils/namespace').extractName
-  , oo = require('./libs/utils/oo');
+  , oo = require('./libs/utils/oo')
+  , views_filters = require('./libs/views/filters');
   
 /******************************************************************************
  * OPTIONS
@@ -68,7 +69,16 @@ function setupControllers(app) {
           
           res.send = oSend;
           
-          res.render(path.join(dir, VIEWS_DIR_NAME, name,  [name, method, 'jade'].join('.') ), _.extend(obj, {controller: name}) );
+          res.render
+           ( path.join
+               ( dir
+               , VIEWS_DIR_NAME
+               , name
+               ,  [name, method, 'jade'].join('.') 
+               )
+           , _.extend(obj, {controller: name}) 
+           )
+           ;
         };
       }    
       methods[method](req, res);
@@ -320,11 +330,15 @@ var rocket = {
         return ret;
       }
       
+      //extend the jade engine with our filters
+      var jade = require('jade');
+      oo.__extends(jade.filters, views_filters);
+      
       //default configuration
       app.configure(function() {
         app.set("view engine", 'jade');
         app.set("views", path.join(app._rocket.app_dir, VIEWS_DIR_NAME));
-        app.register(".jade",require('jade'));
+        app.register(".jade", jade);
         
         app.use(express.methodOverride());
         

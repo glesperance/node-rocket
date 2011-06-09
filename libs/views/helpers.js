@@ -6,17 +6,17 @@ var Helpers = {};
  * INPUTS DEFs
  */
 
-var SELECT_DEF          : { type: 'select', container: true }
-  , LABEL_DEF           : { type: 'label', container: true }
-  , TEXT_AREA_DEF       : { type: 'textaarea', container: true})
-  , TEXT_FIELD_DEF      : { type: 'input', attributes: { type: 'text' } }
-  , PASSWORD_FIELD_DEF  : { type: 'input', attributes: { type: 'password' } }
-  , HIDDEN_FIELD_DEF    : { type: 'input', attributes: { type: 'hidden' } }
-  , RADIO_BUTTON_DEF    : { type: 'input', attributes: { type: 'radio' } }
-  , CHECK_BOX_DEF       : { type: 'input', attributes: { type: 'checkbox' } }
-  , FILE_FIELD_DEF      : { type: 'input', attributes: { type: 'file'} }
-  , SUBMIT_DEF          : { type: 'input', noName: true, attributes: { type: 'submit', name: 'commit' } }
-  };
+var SELECT_DEF          = { type: 'select', container: true }
+  , LABEL_DEF           = { type: 'label', container: true }
+  , TEXT_AREA_DEF       = { type: 'textaarea', container: true}
+  , TEXT_FIELD_DEF      = { type: 'input', attributes: { type: 'text', class: 'text_field' } }
+  , PASSWORD_FIELD_DEF  = { type: 'input', attributes: { type: 'password' } }
+  , HIDDEN_FIELD_DEF    = { type: 'input', noId: true, attributes: { type: 'hidden' } }
+  , RADIO_BUTTON_DEF    = { type: 'input', attributes: { type: 'radio' } }
+  , CHECK_BOX_DEF       = { type: 'input', attributes: { type: 'checkbox' } }
+  , FILE_FIELD_DEF      = { type: 'input', attributes: { type: 'file'} }
+  , SUBMIT_DEF          = { type: 'input', noName: true, attributes: { type: 'submit', name: 'commit', class: 'submit' } }
+  ;
 
 /******************************************************************************
  * TAG HELPERS
@@ -27,31 +27,31 @@ function createTagHelper(options) {
     var tag_type = options.type
       , tag = ''
       , all_attributes = {}
-      , content = undefined
-      , attributes = undefined
+      , content = ''
+      , attributes = ''
       ;
-      
+    
     //if the tag_type is 'label' put attributes.for = name 
     if(tag_type === 'label'){
       all_attributes['for'] = (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
-      content = arguments[1];
-      attributes =  argument[2] || {};
+      content = arguments[1] || content;
+      attributes =  arguments[2] || {};
     }else{
     //else set attr.id = attr.name attr = name (in the attributes obj)
       if(!options.noName) {
-              
-        all_attributes.['name'] = (options.model_name ? model_name + '[' + arguments[0] + ']' : arguments[0]);
+        
+        all_attributes['name'] = (options.model_name ? model_name + '[' + arguments[0] + ']' : arguments[0]);
         
         if(!options.noId) {  
           all_attributes['id'] = (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
         }
         
-        content = arguments[1];
-        attributes =  argument[2] || {};
+        content = arguments[1] || content;
+        attributes =  arguments[2] || {};
         
       }else{
-        content = arguments[0];
-        attributes =  argument[1] || {};
+        content = arguments[0] || content;
+        attributes =  arguments[1] || {};
       }
     }
     
@@ -71,7 +71,8 @@ function createTagHelper(options) {
     
     //add all attributes to the (opening) tag
     for(var attr in all_attributes) {
-      tag += ' ' + attr . '="' + attributes[attr] + '"';
+      tag += ' ' + attr + '="' + all_attributes[attr].toString() + '"';
+      console.log('!!!' + require('util').inspect(attributes));
     }
     
     if(options.container) {
@@ -89,12 +90,38 @@ function createTagHelper(options) {
       tag += ' />';
     }
     //return tag
-    return tag;
+    this.content = (this.content ? this.content : '') + tag;
   };
 }
+var select_tag          = createTagHelper(SELECT_DEF)
+  , label_tag           = createTagHelper(LABEL_DEF)
+  , text_field_tag      = createTagHelper(TEXT_FIELD_DEF)
+  , text_area_tag       = createTagHelper(TEXT_AREA_DEF)
+  , password_field_tag  = createTagHelper(PASSWORD_FIELD_DEF)
+  , hidden_field_tag    = createTagHelper(HIDDEN_FIELD_DEF)
+  , radio_button_tag    = createTagHelper(RADIO_BUTTON_DEF)
+  , check_box_tag       = createTagHelper(CHECK_BOX_DEF)
+  , file_field_tag      = createTagHelper(FILE_FIELD_DEF)
+  , submit_tag          = createTagHelper(SUBMIT_DEF)
+  , options_for_select  = function options_for_select(options, selected_idx) {
+      var html = '';
+      for(var i = 0, len = options.length; i < len; i++) {
+        
+        text += '<option value="' + options[i][1] + '"';
+        
+        if(typeof selected_idx !== 'undefined' && selected_idx !== null) {
+          text += ' selected="selected"';
+        }
+        
+        text += '>' + options[i][0] + '</option>';
+      }
+      return html;
+    }
+  ;
+
 
 var formTags = {
-    select_tag          : createTaghelper(SELECT_DEF)
+    select_tag          : createTagHelper(SELECT_DEF)
   , label_tag           : createTagHelper(LABEL_DEF)
   , text_field_tag      : createTagHelper(TEXT_FIELD_DEF)
   , text_area_tag       : createTagHelper(TEXT_AREA_DEF)
@@ -119,7 +146,9 @@ var formTags = {
       return html;
     }
   };
-  
+
+oo.__extends(this, formTags);
+
 /******************************************************************************
  * Schema type to Tag map
  */
@@ -135,19 +164,19 @@ function addAttributes(tag_helper, new_attributes) {
 };
  
 var schemaToForm = {
-    Boolean:      {type: 'check_box'      , {attributes: {class: ['Boolean']}}
+    Boolean:      {type: 'check_box'      , attributes: {class: ['Boolean']}}
   , String:       {type: 'text_field'} 
-  , Email:        {type: 'text_field'     , {attributes: {class: ['Email'], placeholder: 'Email Address'}}
-  , Password:     {type: 'password_field' , {attributes: {class: ['Password'], placeholder: 'Password'}}
-  , AlphaNumeric: {type: 'text_field'     , {attributes: {class: ['AlphaNumeric']}}
-  , Number:       {type: 'text_field'     , {attributes: {class: ['Number']}}
-  , Float:        {type: 'text_field'     , {attributes: {class: ['Number', 'Float']}}
-  , Integer:      {type: 'text_field'     , {attributes: {class: ['Number', 'Integer']}}
-  , Date:         {type: 'text_field'     , {attributes: {class: ['Date']}}
-  , DateTime:     {type: 'text_field'     , {attributes: {class: ['Date','DateTime']}}
-  , Time:         {type: 'text_field'     , {attributes: {class: ['Time']}}
-  , Text:         {type: 'text_area'      , {attributes: {class: ['Text']}}
-  , Url:          {type: 'text_field'     , {attributes: {class: ['Url']}}
+  , Email:        {type: 'text_field'     , attributes: {class: ['Email'], placeholder: 'Email Address'}}
+  , Password:     {type: 'password_field' , attributes: {class: ['Password'], placeholder: 'Password'}}
+  , AlphaNumeric: {type: 'text_field'     , attributes: {class: ['AlphaNumeric']}}
+  , Number:       {type: 'text_field'     , attributes: {class: ['Number']}}
+  , Float:        {type: 'text_field'     , attributes: {class: ['Number', 'Float']}}
+  , Integer:      {type: 'text_field'     , attributes: {class: ['Number', 'Integer']}}
+  , Date:         {type: 'text_field'     , attributes: {class: ['Date']}}
+  , DateTime:     {type: 'text_field'     , attributes: {class: ['Date','DateTime']}}
+  , Time:         {type: 'text_field'     , attributes: {class: ['Time']}}
+  , Text:         {type: 'text_area'      , attributes: {class: ['Text']}}
+  , Url:          {type: 'text_field'     , attributes: {class: ['Url']}}
   };
   
 var createModelFormTags = function(model) {
@@ -191,21 +220,37 @@ var createModelFormTags = function(model) {
  */
 
 var __form_tag = createTagHelper({type: 'form', noName: true, container: true});
+
+function ContentObj() {}
+oo.__extends(ContentObj.prototype, formTags);
  
 Helpers.form_tag = function form_tag(/* route, (attributes,) content_fun */) {
   
   var route = arguments[0]
-    , attributes = (arguments.length === 3 ? arguments[1] : {}) /* OPTIONAL */
+    , attributes = (arguments.length === 3 ? arguments[1] : {})|| {}/* OPTIONAL */
     , content_fun = (arguments.length === 3 ? arguments[2] : arguments[1])
+    , contentObj = new ContentObj();
     ;
   
   attributes.method = attributes.method || 'POST';
   attributes.action = (typeof route === 'string' ? route : link_to(route))
   
-  var content = formTags.hidden_field_tag('_method', attributes.method);
-  content += content_fun(formTags);
+  formTags.hidden_field_tag.call(contentObj, '_method', attributes.method);
   
-  return __form_tag(content, attributes);
+  if(typeof content_fun === 'string') {
+    console.log(content_fun);
+    var lines = content_fun.split('\\' + 'n');
+    for(var i =0, len = lines.length; i < len; i++) { lines[i] = lines[i].replace(/[\\]{1,1}/g, ''); }
+    content_fun = lines.join('\n');
+    console.log('/*** 2 ***/');
+    console.log(content_fun);
+   // throw('');
+    content_fun = new Function(content_fun);
+  }
+  content_fun.toString();
+  content_fun.call(contentObj);
+  //console.log(contentObj);
+  return (new __form_tag(contentObj.content, attributes)).content;
 };
 
 /******************************************************************************
