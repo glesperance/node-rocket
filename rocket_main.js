@@ -259,7 +259,7 @@ function compileExports(app) {
     
       for (var j = 0; j < dirs.length; j++) {
         var objName = dirs[j].split(".")[0]
-          , obj = require(exported_dirs[export_name] + dirs[j]);
+          , obj = require(path.join(exported_dirs[export_name], dirs[j]));
     
           container[objName] = obj;
       }      
@@ -273,7 +273,7 @@ function compileExports(app) {
     }
   }
   
-  if(myExports.length > 0) {
+  if(myExports !== {}) {
     app._rocket.dnode = dnode(myExports);
   }
   
@@ -334,7 +334,7 @@ var rocket = {
             base : [path.join(app._rocket.app_dir, CLIENT_LIBS_DIR)]
           , mount : '/browserify.js'
           , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
-          , require: ['dnode']
+          , require: ['dnode', 'traverse']
           }));
       });
       
