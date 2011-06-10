@@ -72,7 +72,6 @@ function createTagHelper(options) {
     //add all attributes to the (opening) tag
     for(var attr in all_attributes) {
       tag += ' ' + attr + '="' + all_attributes[attr].toString() + '"';
-      console.log('!!!' + require('util').inspect(attributes));
     }
     
     if(options.container) {
@@ -238,18 +237,14 @@ Helpers.form_tag = function form_tag(/* route, (attributes,) content_fun */) {
   formTags.hidden_field_tag.call(contentObj, '_method', attributes.method);
   
   if(typeof content_fun === 'string') {
-    console.log(content_fun);
     var lines = content_fun.split('\\' + 'n');
     for(var i =0, len = lines.length; i < len; i++) { lines[i] = lines[i].replace(/[\\]{1,1}/g, ''); }
     content_fun = lines.join('\n');
-    console.log('/*** 2 ***/');
-    console.log(content_fun);
    // throw('');
     content_fun = new Function(content_fun);
   }
   content_fun.toString();
   content_fun.call(contentObj);
-  //console.log(contentObj);
   return (new __form_tag(contentObj.content, attributes)).content;
 };
 
