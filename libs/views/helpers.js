@@ -9,12 +9,12 @@ var Helpers = {};
 var SELECT_DEF          = { type: 'select', container: true }
   , LABEL_DEF           = { type: 'label', container: true }
   , TEXT_AREA_DEF       = { type: 'textaarea', container: true}
-  , TEXT_FIELD_DEF      = { type: 'input', attributes: { type: 'text', class: 'text_field' } }
-  , PASSWORD_FIELD_DEF  = { type: 'input', attributes: { type: 'password' } }
-  , HIDDEN_FIELD_DEF    = { type: 'input', noId: true, attributes: { type: 'hidden' } }
-  , RADIO_BUTTON_DEF    = { type: 'input', attributes: { type: 'radio' } }
-  , CHECK_BOX_DEF       = { type: 'input', attributes: { type: 'checkbox' } }
-  , FILE_FIELD_DEF      = { type: 'input', attributes: { type: 'file'} }
+  , TEXT_FIELD_DEF      = { type: 'input', attributes: { type: 'text', class: 'text_field input' } }
+  , PASSWORD_FIELD_DEF  = { type: 'input', attributes: { type: 'password', class: 'input'  } }
+  , HIDDEN_FIELD_DEF    = { type: 'input', noId: true, attributes: { type: 'hidden', class: 'input'  } }
+  , RADIO_BUTTON_DEF    = { type: 'input', attributes: { type: 'radio', class: 'input'  } }
+  , CHECK_BOX_DEF       = { type: 'input', attributes: { type: 'checkbox', class: 'input'  } }
+  , FILE_FIELD_DEF      = { type: 'input', attributes: { type: 'file', class: 'input' } }
   , SUBMIT_DEF          = { type: 'input', noName: true, attributes: { type: 'submit', name: 'commit', class: 'submit' } }
   ;
 
@@ -28,14 +28,14 @@ function createTagHelper(options) {
       , tag = ''
       , all_attributes = {}
       , content = ''
-      , attributes = ''
+      , attributes = {}
       ;
     
     //if the tag_type is 'label' put attributes.for = name 
     if(tag_type === 'label'){
       all_attributes['for'] = (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
       content = arguments[1] || content;
-      attributes =  arguments[2] || {};
+      attributes =  arguments[2] || attributes;
     }else{
     //else set attr.id = attr.name attr = name (in the attributes obj)
       if(!options.noName) {
@@ -47,16 +47,21 @@ function createTagHelper(options) {
         }
         
         content = arguments[1] || content;
-        attributes =  arguments[2] || {};
+        attributes =  arguments[2] || attributes;
         
       }else{
         content = arguments[0] || content;
-        attributes =  arguments[1] || {};
+        attributes =  arguments[1] || attributes;
       }
     }
     
     if(options.attributes) {
       oo.__extends(all_attributes, options.attributes, {overwrite: true});
+    }
+    
+    if(options.attributes &&  options.attributes['class'] && attributes['class']) {
+      all_attributes['class'] += ' ' + attributes['class'];
+      delete attributes['class'];
     }
     
     if(attributes) {
