@@ -8,6 +8,7 @@ var fs        = require("fs")
   ;
   
 var extractName = require('./libs/utils/namespace').extractName
+  , checkName = require('./libs/utils/namespace').checkName
   , oo = require('./libs/utils/oo')
   , views_filters = require('./libs/views/filters');
   
@@ -137,7 +138,7 @@ function setupControllers(app) {
 
   /**
    * Gets the name of each controller and searches through the view folder
-   * to see wether it finds a corresponding view
+   * to see whether it finds a corresponding view
    */
   function searchFolders(dir) {    
     var controllers = []
@@ -171,15 +172,16 @@ function setupControllers(app) {
     }
 
     for(var i = 0; i < controllers.length; i++) {
-    
-      //Gets dir/name.controller.js and returns name
-      var controller = extractName( controllers[i]
-                                  , {extension: true , suffix: CONTROLLER_SUFFIX}
-                                  );
-
-      if(views.indexOf(controller) !== -1) { has_view = true; }
-
-      setController(controller, has_view, dir);
+      if(checkName(controllers[i])) {
+        //Gets dir/name.controller.js and returns name
+        var controller = extractName( controllers[i]
+                                    , {extension: true , suffix: CONTROLLER_SUFFIX}
+                                    );
+  
+        if(views.indexOf(controller) !== -1) { has_view = true; }
+  
+        setController(controller, has_view, dir);
+      }
     }
   }
 
