@@ -1,7 +1,3 @@
-# THIS IS A WORK IN PROGRESS
-  node-rocket is in its early stage at the moment. This message will be removed
-  when it will be suitable for *unstable but less chaotic* use.
-  
 # Rocket (node-rocket) 
 
   <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
@@ -33,7 +29,7 @@
     |
     |-- views
     |    # Contains your applications's main layout, template files and associated
-    |    # partials/helpers.
+    |    # partials.
     |
     |- launcher.js
 
@@ -49,21 +45,159 @@
     |-- static
          # Contains all your static files.
 
-### Allow the browser to `require()`  your javascript modules with `./client/libs/`
+### Allow the browser to `require()` your javascript modules with `./client/libs/`
+
+Each files/folders located under the `./client/libs/` directory of your project 
+are made available to the client's browser by **Rocket** via the `require()` command.
+The modules are referenced by their relative path from the `./client/libs/` 
+folder.
+
+e.g. To require a moduled located at `./clients/libs/a.js` from the browser:
+
+    var a = require('./a');
+    
+The modules can also be located further down the `./client/libs` directory tree.
+Hence you can require the file located at `./client/libs/nested/dirs/b.js` by 
+doing :
+
+    var myModuleFct = require('./client/libs/nested/dirs/b').myModuleFct;
+
+Usual _CommonJS_ conventions apply to the modules.  
 
 ### Serving static files via `./client/static`
 
+All files located under the `./client/static/` directory are statically served
+by **Rocket** under the `http://example.com/static/` URL.
+
+Putting forth the use of conventions common to all **Rocket** projects, every 
+project is initally created with the following files/dirs in `./client/static/`:
+
+    ./client/static/
+    |
+    |-- css
+    |
+    |-- font
+    |
+    |-- img
+    |
+    |-- apple-touch-icon.png
+    |
+    |-- favicon.ico
+
+
 ## Controllers
 
-### Setting up your `/` controller via `./controllers/root_controller.js`
+By using a modified version of the powerfull [express-resource](https://github.com/visionmedia/express-resource "Express Resource - GitHub") plugin, **Rocket** provides
+you with a robust way of automatically mapping your _controllers_ to your _routes_.
 
-### Setting up other controllers via `./controllers/[controller name]_controller.js`
+Each time you launch your application, **Rocket** takes all the modules located
+under `./controllers/[controller_name]_controller.js`, and maps their exported 
+functions as follows :
 
-### Defining custom routes for your controllers
+    GET     /[controller_name]              ->  index
+    GET     /[controller_name]/new          ->  new
+    POST    /[controller_name]              ->  create
+    GET     /[controller_name]/:forum       ->  show
+    GET     /[controller_name]/:forum/edit  ->  edit
+    PUT     /[controller_name]/:forum       ->  update
+    DELETE  /[controller_name]/:forum       ->  destroy
 
-#### Nesting controllers
+e.g.: 
 
-## Exports
+    GET     /forums              ->  require('./controllers/forums_controller').index
+    GET     /forums/new          ->  require('./controllers/forums_controller').new
+    POST    /forums              ->  require('./controllers/forums_controller').create
+    GET     /forums/:forum       ->  require('./controllers/forums_controller').show
+    GET     /forums/:forum/edit  ->  require('./controllers/forums_controller').edit
+    PUT     /forums/:forum       ->  require('./controllers/forums_controller').update
+    DELETE  /forums/:forum       ->  require('./controllers/forums_controller').destroy
+    
+Where {index, new, create, show, edit, update, destroy} are normal _express_
+callbacks of the form 
+
+    function(req,res) { /* ... */ }
+    
+It is important to note that the root `/` controller is lcoated at 
+`./controllers/root_controller.js`
+
+For more info see : [express-resource readme](https://github.com/visionmedia/express-resource "Express Resource - GitHub")
+
+### Conventions on controller names
+
+Controller names must
+
+* be plural
+* be all lower case
+* be underscored
+* have a *_controller* suffix
+
+Hence, the controller `./controller/hyper_beams_controller.js` is conform whereas
+`controller/hyper_beams.js` and `controller/hyper_beam_controller.js` are not.
+
+### Defining custom actions for your controllers
+
+In cases where you might need to derive from the RESTful conventions, *Rocket*
+provides to  you a way to add custom actions to your controllers by mapping any
+exported function but {index, new, create, show, edit, update, destroy} as follows:
+
+    {GET, POST, PUT, DELETE}  /[controller_name]/myAction  ->  myAction
+
+You can also be more specific in your mapping by making `myAction` an object:
+    
+    GET     /[controller_name]/myAction  ->  myAction.get
+    POST    /[controller_name]/myAction  ->  myAction.post
+    PUT     /[controller_name]/myAction  ->  myAction.put
+    DELETE  /[controller_name]/myAction  ->  myAction.destroy
+
+### Exporting functions of a controller without mapping them to a route
+
+By default *Rocket* ignores all exported functions prefixed with an underscore `_`.
+
+This can be used for example if you want to be able to `require` and extend a
+*base* controller from which you want to inherit some property or methods.
+
+### Auto-loading resource for your controller
+
+It is possible -- via express-resource -- to *auto-load* the data associated with
+a specific `id` so that it is automatically loaded for your controller to use.
+
+Simply put, this can be done by providing exporting the function in question as
+`_load` in the controller module.
+
+Auto-loading function take the following form:
+
+    exports._load = function(id, cb) {
+      var err
+        , obj
+        ;
+        
+      //(1) -- load the object with the specified id
+      
+      //(2) -- call the callback
+      cb(err, obj);
+    }
+
+For more info see [express-resource readme](https://github.com/visionmedia/express-resource "Express Resource - GitHub").
+
+### Nesting controllers
+
+You can nest controllers by leveraging `app.controllers` and the *express-resource* `add` 
+function in your `./launcher.js` file :
+
+    /****************************************************************
+     * LAUNCHER.JS
+     */
+    var rocket = require('rocket')
+      , LISTEN_PORT = 80
+      , app = rocket.createServer(__dirname)
+      ;
+      
+    app.listen(LISTEN_PORT);
+    
+    //Nest the `children` controller under the `parents` controller.
+    app.controllers.parents.add(app.controllers.children);
+
+## _dnode_ exports
 
 ### Exporting remote functions/objects to the client via `./exports/`
 
@@ -79,6 +213,8 @@
 * Automatically validates your documents on the server using `model.schema` and `validate_doc_update`
 
 #### Using `model.schema` to leverage `Rocket` automatic validation procedures
+
+#### How to invoke your couchDB views
 
 #### Creating your own validators using `validate_doc_update`
 
