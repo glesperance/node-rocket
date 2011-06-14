@@ -144,10 +144,17 @@ exported function but {index, new, create, show, edit, update, destroy} as follo
 
 You can also be more specific in your mapping by making `myAction` an object:
     
-    GET     /[controller_name]/myAction  ->  myAction.get
-    POST    /[controller_name]/myAction  ->  myAction.post
-    PUT     /[controller_name]/myAction  ->  myAction.put
-    DELETE  /[controller_name]/myAction  ->  myAction.destroy
+    GET     /[controller_name]/myAction/    --\
+            /[controller_name]/myAction/:id ---\-->  myAction.get
+    
+    POST    /[controller_name]/myAction/    --\
+            /[controller_name]/myAction/:id ---\-->  myAction.post
+    
+    PUT     /[controller_name]/myAction/    --\
+            /[controller_name]/myAction/:id ---\-->  myAction.put
+            
+    DELETE  /[controller_name]/myAction/    --\
+            /[controller_name]/myAction/:id ---\-->  myAction.destroy
 
 ### Exporting functions of a controller without mapping them to a route
 
