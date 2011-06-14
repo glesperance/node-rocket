@@ -214,12 +214,12 @@ function in your `./launcher.js` file :
 
 ### Making worry free models using CouchDBResource
 
-* Automatically creates DB in accordance with `model.name`
-* Automatically SYNC your `_design` documents (or views, lists, updates, shows, etc)
+* Automatically creates DB in accordance with model.name
+* Automatically SYNC your _design documents (or views, lists, updates, shows, etc)
 * Automatically SYNC your _security document
-* Automatically validates your documents on the server using `model.schema` and `validate_doc_update`
+* Automatically validates your documents on the server using model.schema and validate_doc_update
 
-#### Using `model.schema to leverage `Rocket` automatic validation procedures
+#### Using model.schema to leverage Rocket automatic validation procedures
 
 #### How to invoke your couchDB views
 
