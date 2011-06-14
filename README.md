@@ -34,7 +34,7 @@
     |- launcher.js
 
 ## Client
-### Directory Structure of the `Client` directory
+### Directory Structure of the Client directory
 
     ./client/
     |
@@ -45,14 +45,14 @@
     |-- static
          # Contains all your static files.
 
-### Allow the browser to `require()` your javascript modules with `./client/libs/`
+### Allow the browser to require() your javascript modules with ./client/libs/
 
 Each files/folders located under the `./client/libs/` directory of your project 
 are made available to the client's browser by **Rocket** via the `require()` command.
 The modules are referenced by their relative path from the `./client/libs/` 
 folder.
 
-e.g. To require a moduled located at `./clients/libs/a.js` from the browser:
+e.g. To require a moduled located at ./clients/libs/a.js from the browser:
 
     var a = require('./a');
     
@@ -64,7 +64,7 @@ doing :
 
 Usual _CommonJS_ conventions apply to the modules.  
 
-### Serving static files via `./client/static`
+### Serving static files via ./client/static
 
 All files located under the `./client/static/` directory are statically served
 by **Rocket** under the `http://example.com/static/` URL.
@@ -117,8 +117,8 @@ callbacks of the form
 
     function(req,res) { /* ... */ }
     
-It is important to note that the root `/` controller is lcoated at 
-`./controllers/root_controller.js`
+It is important to note that the root / controller is lcoated at 
+./controllers/root_controller.js
 
 For more info see : [express-resource readme](https://github.com/visionmedia/express-resource "Express Resource - GitHub")
 
@@ -204,22 +204,22 @@ function in your `./launcher.js` file :
     //Nest the `children` controller under the `parents` controller.
     app.rocket.controllers.parents.add(app.rocket.controllers.children);
 
-## _dnode_ exports
+## Dnode exports
 
-### Exporting remote functions/objects to the client via `./exports/`
+### Exporting remote functions/objects to the client via ./exports/
 
 ### Calling your exported functions from the client -- or browser.
 
 ## Models
 
-### Making worry free models using `CouchDBResource` 
+### Making worry free models using CouchDBResource
 
 * Automatically creates DB in accordance with `model.name`
 * Automatically SYNC your `_design` documents (or views, lists, updates, shows, etc)
 * Automatically SYNC your _security document
 * Automatically validates your documents on the server using `model.schema` and `validate_doc_update`
 
-#### Using `model.schema` to leverage `Rocket` automatic validation procedures
+#### Using `model.schema to leverage `Rocket` automatic validation procedures
 
 #### How to invoke your couchDB views
 
