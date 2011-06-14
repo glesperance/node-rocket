@@ -181,7 +181,7 @@ For more info see [express-resource readme](https://github.com/visionmedia/expre
 
 ### Nesting controllers
 
-You can nest controllers by leveraging `app.controllers` and the *express-resource* `add` 
+You can nest controllers by leveraging `app.rocket.controllers` and the *express-resource* `add` 
 function in your `./launcher.js` file :
 
     /****************************************************************
@@ -195,7 +195,7 @@ function in your `./launcher.js` file :
     app.listen(LISTEN_PORT);
     
     //Nest the `children` controller under the `parents` controller.
-    app.controllers.parents.add(app.controllers.children);
+    app.rocket.controllers.parents.add(app.rocket.controllers.children);
 
 ## _dnode_ exports
 
