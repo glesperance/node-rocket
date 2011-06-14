@@ -71,10 +71,9 @@ function setupControllers(app) {
   
   var top_dir = app.rocket.app_dir;
    
-  function buildWrapper(name, method, has_view, dir) {
+  function buildWrapper(name, method_name, method, has_view, dir) {
     return function(req, res) {
-      var methods = require(path.join(dir, CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX));
-        
+            
       if(!req.xhr && has_view) {
         var oSend = res.send;
         var oRender = res.render;
@@ -82,7 +81,8 @@ function setupControllers(app) {
         res.render = function() {
           res.send = oSend;
           oRender.apply(this, arguments);
-        }
+        };
+        
         res.send = function(obj) {
           obj = obj || {};
           
@@ -93,14 +93,14 @@ function setupControllers(app) {
                ( dir
                , VIEWS_DIR_NAME
                , name
-               ,  [name, method, 'jade'].join('.') 
+               ,  [name, method_name, 'jade'].join('.') 
                )
            , _.extend(obj, {controller: name}) 
            )
            ;
         };
       }    
-      methods[method](req, res);
+      method(req, res);
     };
   }
 
@@ -118,11 +118,11 @@ function setupControllers(app) {
       , view_methods = []
       , split = []
       , controller = require(path.join(dir, CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX))
-      , controller_methods = _.functions(controller)
+      , controller_keys = _.keys(controller)
       , resource = undefined
       , load = undefined
       ;
-
+    
     if (typeof app.rocket.controllers[name] !== 'undefined') {
       throw("Route already in use".red);
     }
@@ -140,33 +140,84 @@ function setupControllers(app) {
       }
     }
 
-    for(var i = 0; i < controller_methods.length; i++) {
-      var method_view = false;
+    for(var i = 0, len = controller_keys.length; i < len; i++) {
+      var key = controller_keys[i]
+        , has_view = false
+        ;
       
-      //ignore methods beginning with a `_`
-      if(controller_methods[i].substr(0,1) === '_') {
+      //ignore keys beginning with a `_` unless it is `_load`
+      if(key.substr(0,1) === '_') {
         
-        //check if the method name is `_load` if so, save it
-        if(controller_methods[i] === '_load') {
-          loader = controller[controller_methods[i]];
+        //check if the method name is `_load`  and it is a fct ... save it.
+        if(key === '_load' && typeof controller[key] === 'function') {
+          loader = controller[key];
         }
         
+        //skip to next key
         continue;
       }
       
-      if(view_methods.indexOf(controller_methods[i]) !== -1) {
-        method_view = true;
+      if(typeof controller[key] === 'object' && controller[key] !== null) {
+        var methods = _.functions(controller[key])
+          , route = (name === 'root' ? path.join('/', key) : path.join('/', name,  key))
+          , param = ':id'
+          , inner_wrap = {}
+          ;
+        
+        for(var i = 0, len = methods.length; i < len; i++) {
+          var method_name  = methods[i]
+            , method = controller[key][method_name]
+            ;
+          
+          if(['get', 'post', 'put', 'del'].indexOf(method) !== -1) {
+            
+            var wrapped = undefined
+                full_name = [key, method_name].join('.')
+              ;
+            
+            if(view_methods.indexOf(full_name) !== -1) {
+              has_view = true;
+            }
+                        
+            wrapped = buildWrapper(name, full_name, method , has_view, dir);
+           
+            app[method_name](route, wrapped);
+            app[method](path.join(route, param), wrapped);
+          }
+        }
+      
+      }else if(typeof controller[key] === 'function') {
+        
+        var wrapped = undefined;
+        
+        if(view_methods.indexOf(key) !== -1) {
+          has_view = true;
+        }
+        
+        wrapped = buildWrapper(name, key, controller[key], has_view, dir);
+        
+        //if the function is not a custom controller method ...
+        if(['index', 'show', 'new', 'create', 'edit', 'update', 'destroy'].indexOf(key) === -1) {
+          var route = (name === 'root' ? path.join('/', key) : path.join('/', name,  key))
+            , param = ':id'
+            ;
+          
+          app.all(route, wrapped);
+          app.all(path.join(route, param), wrapped);
+        }
+        
+        wrapped_funcs[key] = wrapped; 
       }
       
-      wrapped_funcs[controller_methods[i]] = buildWrapper(name, controller_methods[i], method_view, dir);
     }
-
-    if (name === 'root') {
+    
+  
+    if(name === 'root') {
       resource = app.resource(wrapped_funcs);
     } else {
       resource = app.resource(name, wrapped_funcs);
     }
-    
+  
     if(typeof loader !== 'undefined') {
       resource.load(loader);
     }
