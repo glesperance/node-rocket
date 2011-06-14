@@ -36,6 +36,18 @@ var MODELS_DIR_NAME        = 'models'
   
   /* namespace constants */
   , CONTROLLER_SUFFIX = '_controller'
+  
+  /* RESTful methods names */
+  , RESTFUL_METHODS = [
+        'index'
+      , 'show'
+      , 'new'
+      , 'create'
+      , 'edit'
+      , 'update'
+      , 'destroy'
+      ]
+      ;
   ;
   
 /******************************************************************************
@@ -57,7 +69,7 @@ function setupControllers(app) {
    * or a rendered view
    */
   
-  var top_dir = app._rocket.app_dir;
+  var top_dir = app.rocket.app_dir;
    
   function buildWrapper(name, method, has_view, dir) {
     return function(req, res) {
@@ -65,6 +77,12 @@ function setupControllers(app) {
         
       if(!req.xhr && has_view) {
         var oSend = res.send;
+        var oRender = res.render;
+        
+        res.render = function() {
+          res.send = oSend;
+          oRender.apply(this, arguments);
+        }
         res.send = function(obj) {
           obj = obj || {};
           
@@ -99,11 +117,14 @@ function setupControllers(app) {
       , view_methods_files = []
       , view_methods = []
       , split = []
-      , controller_methods = _.functions(require(path.join(dir, CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX)))
+      , controller = require(path.join(dir, CONTROLLERS_DIR_NAME, name + CONTROLLER_SUFFIX))
+      , controller_methods = _.functions(controller)
+      , resource = undefined
+      , load = undefined
       ;
 
-    if (app._rocket.routes.indexOf(name) !== -1) {
-      throw("Route already in use");
+    if (typeof app.rocket.controllers[name] !== 'undefined') {
+      throw("Route already in use".red);
     }
 
     if (has_view) {
@@ -121,7 +142,18 @@ function setupControllers(app) {
 
     for(var i = 0; i < controller_methods.length; i++) {
       var method_view = false;
-
+      
+      //ignore methods beginning with a `_`
+      if(controller_methods[i].substr(0,1) === '_') {
+        
+        //check if the method name is `_load` if so, save it
+        if(controller_methods[i] === '_load') {
+          loader = controller[controller_methods[i]];
+        }
+        
+        continue;
+      }
+      
       if(view_methods.indexOf(controller_methods[i]) !== -1) {
         method_view = true;
       }
@@ -130,10 +162,17 @@ function setupControllers(app) {
     }
 
     if (name === 'root') {
-      app.resource(wrapped_funcs);
+      resource = app.resource(wrapped_funcs);
     } else {
-      app.resource(name, wrapped_funcs);
+      resource = app.resource(name, wrapped_funcs);
     }
+    
+    if(typeof loader !== 'undefined') {
+      resource.load(loader);
+    }
+    
+    app.rocket.controllers[name] = resource;
+    app.rocket.controllers[name].actions = wrapped_funcs;
   }
 
   /**
@@ -219,13 +258,13 @@ function setupControllers(app) {
  * Models Setup
  */  
 function setupModels(app) {
-  var models_files = fs.readdirSync(path.join(app._rocket.app_dir, MODELS_DIR_NAME));
+  var models_files = fs.readdirSync(path.join(app.rocket.app_dir, MODELS_DIR_NAME));
   
   for(var i = 0; i < models_files.length; i++) {
     if(models_files[i] === DATASOURCES_DIR_NAME) {
       continue;
     }
-    var myModel = require(path.join(app._rocket.app_dir, MODELS_DIR_NAME, models_files[i]));
+    var myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, models_files[i]));
     myModel.initialize();
   }
 }
@@ -236,15 +275,15 @@ function setupModels(app) {
 function compileExports(app) {
   var dirs
     , plugins
-    , exported_dirs = {'': path.join(app._rocket.app_dir, EXPORT_DIR_NAME)}
+    , exported_dirs = {'': path.join(app.rocket.app_dir, EXPORT_DIR_NAME)}
     , myExports = {};
   
   // Add plugin exports to EXPORT_DIRS
   if(missing.indexOf(PLUGINS_DIR_NAME) === -1){
     try{
-      plugins = fs.readdirSync(path.join(app._rocket.app_dir, PLUGINS_DIR_NAME));
+      plugins = fs.readdirSync(path.join(app.rocket.app_dir, PLUGINS_DIR_NAME));
       for(var i = 0; i < plugins.length; i++) {
-        exported_dirs[plugins[i]] = path.join(app._rocket.app_dir, PLUGINS_DIR_NAME, plugins[i], EXPORT_DIR_NAME);
+        exported_dirs[plugins[i]] = path.join(app.rocket.app_dir, PLUGINS_DIR_NAME, plugins[i], EXPORT_DIR_NAME);
       }
     }catch(err){
       if(err.code == 'ENOENT') {
@@ -286,7 +325,7 @@ function compileExports(app) {
   }
   
   if(myExports !== {}) {
-    app._rocket.dnode = dnode(myExports);
+    app.rocket.dnode = dnode(myExports);
   }
   
 }
@@ -317,17 +356,18 @@ var rocket = {
   , createServer: function createServer_rocket(app_dir) {
       var app = express.createServer();
       
-      app._rocket = {};
-      app._rocket.routes = [];
+      app.rocket = {};
+      app.rocket.routes = [];
+      app.rocket.controllers = {};
       
-      app._rocket.app_dir = app_dir;
+      app.rocket.app_dir = app_dir;
       
       //replace listen on app
       var express_listen = app.listen;
       app.listen = function () {
         var ret = express_listen.apply(this, arguments);
         if(missing.indexOf(EXPORT_DIR_NAME) === -1 ) {
-          app._rocket.dnode.listen(app);
+          app.rocket.dnode.listen(app);
         }
         return ret;
       }
@@ -339,15 +379,16 @@ var rocket = {
       //default configuration
       app.configure(function() {
         app.set("view engine", 'jade');
-        app.set("views", path.join(app._rocket.app_dir, VIEWS_DIR_NAME));
+        app.set("views", path.join(app.rocket.app_dir, VIEWS_DIR_NAME));
         app.register(".jade", jade);
         
         app.use(express.methodOverride());
         
-        app.use('/static', express.static(path.join(app._rocket.app_dir, CLIENT_STATIC_DIR)));
+        app.use('/static', express.static(path.join(app.rocket.app_dir, CLIENT_STATIC_DIR)));
         app.use(express.bodyParser());
+        app.use(express.cookieParser());
         app.use(require('browserify')({
-            base : [path.join(app._rocket.app_dir, CLIENT_LIBS_DIR)]
+            base : [path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
           , mount : '/browserify.js'
           , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
           , require: ['dnode', 'traverse']
@@ -362,6 +403,8 @@ var rocket = {
       
       //compile exports
       compileExports(app);
+      
+      //console.log(require('util').inspect(app.rocket.controllers, false , 4).green);
       
       return app;
       
