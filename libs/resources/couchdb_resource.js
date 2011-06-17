@@ -242,7 +242,12 @@ var factoryFunctions = {
   , destroy: function destroy_CouchDBResource(_id, callback) {
       this.__db.remove(_id, callback);
     }
-  , all: function all_CouchDBResource(callback) {}
+  , all: function all_CouchDBResource(callback) {
+      this.__db.view('rocket/all', callback);
+    }
+  , view: function view_CouchDBResource() {
+      this.__db.view.apply(this, arguments);
+    }
   };
 
 oo.__extends(CouchDBResource, factoryFunctions, {overwrite: true});
