@@ -167,6 +167,7 @@ function setupControllers(app) {
         for(var i = 0, len = methods.length; i < len; i++) {
           var method_name  = methods[i]
             , method = controller[key][method_name]
+            , has_view = false
             ;
           
           if(['get', 'post', 'put', 'del'].indexOf(method_name) !== -1) {
@@ -175,8 +176,6 @@ function setupControllers(app) {
                 full_name = [key, method_name].join('.')
               ;
             
-            console.log(full_name);
-            console.log(view_methods);
             if(view_methods.indexOf(full_name) !== -1) {
               has_view = true;
             }
@@ -444,7 +443,7 @@ var rocket = {
             base : [path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
           , mount : '/browserify.js'
           , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
-          , require: ['dnode', 'traverse']
+          , require: ['underscore', 'dnode']
           }));
       });
       
