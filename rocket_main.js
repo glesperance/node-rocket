@@ -168,7 +168,7 @@ function setupControllers(app) {
           var method_name  = methods[i]
             , method = controller[key][method_name]
             ;
-          console.log(method);
+          
           if(['get', 'post', 'put', 'del'].indexOf(method_name) !== -1) {
             
             var wrapped = undefined
