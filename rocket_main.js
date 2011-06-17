@@ -135,7 +135,7 @@ function setupControllers(app) {
       for(var i = 0; i < view_methods_files.length; i++) {
         split = view_methods_files[i].split('.');
         if(split[0] === name) {
-          view_methods.push(split[split.length - 2]);
+          view_methods.push(split.slice(1,split.length - 1).join('.'));
         }
       }
     }
@@ -174,7 +174,9 @@ function setupControllers(app) {
             var wrapped = undefined
                 full_name = [key, method_name].join('.')
               ;
-
+            
+            console.log(full_name);
+            console.log(view_methods);
             if(view_methods.indexOf(full_name) !== -1) {
               has_view = true;
             }
