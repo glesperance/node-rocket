@@ -174,7 +174,7 @@ function setupControllers(app) {
             var wrapped = undefined
                 full_name = [key, method_name].join('.')
               ;
-            
+
             if(view_methods.indexOf(full_name) !== -1) {
               has_view = true;
             }
@@ -268,8 +268,8 @@ function setupControllers(app) {
         var controller = extractName( controllers[i]
                                     , {extension: true , suffix: CONTROLLER_SUFFIX}
                                     );
-  
-        if(views.indexOf(controller) !== -1) { has_view = true; }
+
+        if(views.indexOf(controller) !== -1) { has_view = true; } else { has_view = false; }
   
         setController(controller, has_view, dir);
       }
