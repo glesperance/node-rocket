@@ -16,6 +16,7 @@ var SELECT_DEF          = { type: 'select', container: true }
   , CHECK_BOX_DEF       = { type: 'input', attributes: { type: 'checkbox', class: 'input check-box'  } }
   , FILE_FIELD_DEF      = { type: 'input', attributes: { type: 'file', class: 'input file-field' } }
   , SUBMIT_DEF          = { type: 'input', noName: true, attributes: { type: 'submit', name: 'commit', class: 'submit' } }
+  , LINK_DEF            = { type: 'a', noName: true, container: true}
   ;
   
 var schemaToForm = {
@@ -79,7 +80,8 @@ var createModelFormTags = function(model) {
  */
 
 var formTags = {
-    select_tag          : createTagHelper(SELECT_DEF)
+    link_tag            : createTagHelper(LINK_DEF)
+  , select_tag          : createTagHelper(SELECT_DEF)
   , label_tag           : createTagHelper(LABEL_DEF)
   , text_field_tag      : createTagHelper(TEXT_FIELD_DEF)
   , text_area_tag       : createTagHelper(TEXT_AREA_DEF)
@@ -124,6 +126,7 @@ function createTagHelper(options) {
     //if the tag_type is 'label' put attributes.for = name 
     if(tag_type === 'label'){
       all_attributes['for'] = (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
+      all_attributes['class'] = all_attributes['for'];
       content = arguments[1] || content;
       attributes =  arguments[2] || attributes;
     }else{
@@ -133,7 +136,8 @@ function createTagHelper(options) {
         all_attributes['name'] = (options.model_name ? model_name + '[' + arguments[0] + ']' : arguments[0]);
         
         if(!options.noId) {  
-          all_attributes['id'] = (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
+          attributes['id'] = (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
+          attributes['class'] += ' ' + (options.model_name ? model_name + '_' + arguments[0] : arguments[0]);
         }
         
         content = arguments[1] || content;
@@ -204,6 +208,7 @@ Helpers.form_tag = function form_tag(/* route, (attributes,) content_fun */) {
     , content_fun = (arguments.length === 3 ? arguments[2] : arguments[1])
     , contentObj = new ContentObj();
     ;
+  console.log(arguments);
   
   attributes.method = attributes.method || 'POST';
   attributes.action = (typeof route === 'string' ? route : link_to(route));
