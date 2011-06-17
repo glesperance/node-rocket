@@ -72,7 +72,7 @@ function setupControllers(app) {
   var top_dir = app.rocket.app_dir;
    
   function buildWrapper(name, method_name, method, has_view, dir) {
-    return function(req, res) {
+    return function(req, res, next) {
             
       if(!req.xhr && has_view) {
         var oSend = res.send;
@@ -100,7 +100,7 @@ function setupControllers(app) {
            ;
         };
       }    
-      method(req, res);
+      method(req, res, next);
     };
   }
 
