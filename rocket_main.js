@@ -181,7 +181,6 @@ function setupControllers(app) {
                         
             wrapped = buildWrapper(name, full_name, method , has_view, dir);
            
-            console.log(route);
             app[method_name](route, wrapped);
             app[method_name](path.join(route, param), wrapped);
           }
