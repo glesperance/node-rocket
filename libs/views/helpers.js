@@ -208,7 +208,6 @@ Helpers.form_tag = function form_tag(/* route, (attributes,) content_fun */) {
     , content_fun = (arguments.length === 3 ? arguments[2] : arguments[1])
     , contentObj = new ContentObj();
     ;
-  console.log(arguments);
   
   attributes.method = attributes.method || 'POST';
   attributes.action = (typeof route === 'string' ? route : link_to(route));
