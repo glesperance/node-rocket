@@ -168,8 +168,8 @@ function setupControllers(app) {
           var method_name  = methods[i]
             , method = controller[key][method_name]
             ;
-          
-          if(['get', 'post', 'put', 'del'].indexOf(method) !== -1) {
+          console.log(method);
+          if(['get', 'post', 'put', 'del'].indexOf(method_name) !== -1) {
             
             var wrapped = undefined
                 full_name = [key, method_name].join('.')
@@ -181,8 +181,9 @@ function setupControllers(app) {
                         
             wrapped = buildWrapper(name, full_name, method , has_view, dir);
            
+            console.log(route);
             app[method_name](route, wrapped);
-            app[method](path.join(route, param), wrapped);
+            app[method_name](path.join(route, param), wrapped);
           }
         }
       
