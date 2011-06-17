@@ -144,7 +144,7 @@ function setupControllers(app) {
       var key = controller_keys[i]
         , has_view = false
         ;
-      
+        
       //ignore keys beginning with a `_` unless it is `_load`
       if(key.substr(0,1) === '_') {
         
@@ -164,12 +164,12 @@ function setupControllers(app) {
           , inner_wrap = {}
           ;
         
-        for(var i = 0, len = methods.length; i < len; i++) {
-          var method_name  = methods[i]
+        for(var j = 0, len2 = methods.length; j < len2; j++) {
+          var method_name  = methods[j]
             , method = controller[key][method_name]
             , has_view = false
             ;
-          
+            
           if(['get', 'post', 'put', 'del'].indexOf(method_name) !== -1) {
             
             var wrapped = undefined
@@ -186,7 +186,7 @@ function setupControllers(app) {
             app[method_name](path.join(route, param), wrapped);
           }
         }
-      
+        
       }else if(typeof controller[key] === 'function') {
         
         var wrapped = undefined;
@@ -455,8 +455,6 @@ var rocket = {
       
       //compile exports
       compileExports(app);
-      
-      //console.log(require('util').inspect(app.rocket.controllers, false , 4).green);
       
       return app;
       
