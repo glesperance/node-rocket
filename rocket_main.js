@@ -237,7 +237,11 @@ function setupControllers(app) {
       , has_view = false
       , split = []
       ;
-  
+    
+    if(dir.split('/').pop() === 'empty'){
+      return;
+    }
+    
     try{
       controllers = fs.readdirSync(path.join(dir, CONTROLLERS_DIR_NAME));
     }catch(err){
@@ -313,7 +317,7 @@ function setupModels(app) {
   var models_files = fs.readdirSync(path.join(app.rocket.app_dir, MODELS_DIR_NAME));
   
   for(var i = 0; i < models_files.length; i++) {
-    if(models_files[i] === DATASOURCES_DIR_NAME) {
+    if(models_files[i] === DATASOURCES_DIR_NAME || models_files[i] === 'empty') {
       continue;
     }
     var myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, models_files[i]));
@@ -349,8 +353,9 @@ function compileExports(app) {
   
   for(var export_name in exported_dirs) {
     var container;
-    
-    if(export_name === '') {
+    if(export_name === 'empty') {
+      continue;
+    }else if(export_name === '') {
       container = myExports;
     }else{
       myExports[export_name] = {};
