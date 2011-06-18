@@ -3,7 +3,7 @@
 
 <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
 
-RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of comet/real-time web applications using node.js http://nodejs.org and couchDB.
+RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of comet/real-time web applications using node.js and couchDB.
 
 Highly inspired by Ruby on Rails and cakePHP, Rocket puts forward the convention over configuration principle in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as couchDB distributed nature. 
 
