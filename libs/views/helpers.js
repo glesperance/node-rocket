@@ -212,9 +212,10 @@ Helpers.form_tag = function form_tag(/* route, (attributes,) content_fun */) {
   attributes.method = attributes.method || 'POST';
   attributes.action = (typeof route === 'string' ? route : link_to(route));
   
-  content_fun.toString();
-  content_fun.call(contentObj);
+  content_fun.call(contentObj, contentObj);
+  
   return (new __form_tag(contentObj.content, attributes)).content;
+  
 };
 
 /******************************************************************************
