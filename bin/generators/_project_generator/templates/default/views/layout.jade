@@ -1,12 +1,10 @@
-!!! 5
-
-//paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ 
-//[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif] 
-//[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif] 
-//[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif] 
-//[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif] 
-//[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif] 
-
+!='<!doctype html>\n'
+//- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ 
+!='<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->\n'
+!='<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->\n'
+!='<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->\n'
+!='<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->\n'
+!='\n'
 head
   meta(charset="utf-8")
   
@@ -17,7 +15,7 @@ head
   -if (typeof(title) != "undefined" && title !=null)
     title= title + '- Rocket'
   -else
-    title= 'Rocket: The rapid development framework for node.js/couchDB web apps.'
+    title= 'RocketJS: The rapid development framework for node.js/couchDB web apps.'
 
   meta(name="description", content="")
   meta(name="author", content="")
@@ -41,15 +39,18 @@ body
   //- Javascript at the bottom for fast page loading
     
   //- Grab JQuery Tools CDN's jQuery. fall back to local if necessary
-  
   script(src="/browserify.js")
+  script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js")
+  
+  !="<script> window.jQuery || require('./jquery-1.6.1.min.js') </script>"
 
-  !="<script>"
-  !="var boot_options, Bootstrapper = require('./bootstrappers/" + controller + "_bootstrapper');"
-  -if (typeof boot_options != 'undefined' && boot_options != null)
-    !="boot_options = " + JSON.stringify(boot_options) + ";"
-  !="Bootstrapper.bootstrap(boot_options);"
-  !="</script>"
+  -if (typeof controller !== 'undefined')
+    !="<script>"
+    !="var boot_options, Bootstrapper = require('./bootstrappers/" + controller + "_bootstrapper');"
+    -if (typeof boot_options != 'undefined' && boot_options != null)
+      !="boot_options = " + JSON.stringify(boot_options) + ";"
+    !="Bootstrapper.bootstrap(boot_options);"
+    !="</script>"
 
   /if lt IE 7
     script(type="text/javascript")

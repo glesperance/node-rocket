@@ -1,173 +1,146 @@
 #!/usr/bin/env node
 
-// Big thanks to NPM for its nice script.
-/*
-          /\
-         /  \
-        /    \
-       /______\
-      |        |
-      |        |
-      |        |
-      |        |
-      |        |
-      |        |
-     /|   ||   |\
-    / |   ||   | \
-   /  |   ||   |  \
-  /___|   ||   |___\
-      |        |
-       \      /
-        ||  ||
-*/
-;(function () { // wrapper in case we're in module_context mode
-var path = require("path")
-  , semver = require("semver")
-  , nopt = require("nopt")
-  , fs = require("fs")
-  , knownOpts = { "help" : Boolean
-                , "verbose" : Boolean
-                , "version" : Boolean
-                }
-  , shortHands = { "h" : ["--help"]
-                 , "v" : ["--verbose"]
-                 }
-  , parsed = nopt(knownOpts, shortHands, process.argv, 2)
-  , argv= parsed.argv.remain
-  , command= argv.shift()
+(function () {
+  
+  var fs = require('fs')
+    , nopt = require('nopt')
+    , colors = require('colors')
+    ;
 
-var rocket = {
-  command: command
-, argv: argv
-, verbose: parsed.verbose 
-, error : function (msg) {
-    console.error("Houston.. we have a problem. >>> " + msg);
+/******************************************************************************
+ * PRINT USAGE
+ */
+  function printUsage() {
+    console.log(
+        [
+          ''
+        , 'Usage: rocket [command] [argument(s)]' 
+        , ''
+        , 'Options:'
+        , '  -v, --version................................Prints RocketJS\' version'
+        , '  -h, --help...................................Prints this message'
+        , '  -p, --prod, --production.....................Set the current environment to be production mode.'
+        , '                                               Default is development. Used in conjunction with --start'
+        , '  -d, --daemon.................................Set the server to be started in daemon mode.'
+        , '                                                 *** Use --kill to stop the server *** Used in conjunction with --start'
+        , '  -k, --kill...................................Kill the server if it is running. Done before --start if used together.' 
+        , ''
+        , 'Commands:'
+        , '  -s, --start..................................Launch current RocketJS project'
+        , '  -I, --init [project name]....................Initialize project app'
+        , '  -a, --add  [options].........................Add a [type] object to the current project working directory'
+        , '                                                 do --info [type] for more info'
+        , '  -i, --info [type]............................Prints usage information about [type] object'
+        , '  -l, --list...................................Prints the list of all the object types'
+        , ''
+        ].join('\n') 
+    );
+  };
+
+/******************************************************************************
+ * PRINT VERSION
+ */ 
+ function printVersion() {
+    console.log(
+      [
+        ''
+      , '====----> RocketJS ' + require('rocket').version + ' | RocketJS.net | @RocketJS'
+      , '====----> The rapid development framework for node.js/couchDB web apps'
+      , ''
+      ].join('\n')
+    );
+ }
+ 
+/******************************************************************************
+ * KILL SERVER
+ */
+  function killServer() {
+
   }
-, log : function (msg) {
-    if (rocket.verbose) {
-      console.log(msg);
-    }
-  }
-}
 
-try {
-  var j = JSON.parse(fs.readFileSync(path.join(__dirname, "../package.json"))+"")
-  rocket.version = j.version
-  rocket.nodeVersionRequired = j.engines.node
-  if (!semver.satisfies(process.version, j.engines.node)) {
-    rocket.error([""
-               ,"rocket requires node version: "+j.engines.node
-               ,"And you have: "+process.version
-               ,"which is not satisfactory."
-               ,""
-               ,"Bad things will likely happen.  You have been warned."
-               ,""
-              ].join("\n"), "unsupported version")
-  }
-} catch (ex) {
-  try {
-    rocket.log(ex, "error reading version")
-  } catch (er) {}
-  rocket.version = ex
-}
-
-if (parsed.version) {
-  console.log(rocket.version)
-  return
-} else {
-  rocket.log("rocket@"+rocket.version, "using")
-}
-
-rocket.log("node@"+process.version, "using");
-
-// make sure that this version of node works with this version of rocket.
-var nodeVer = process.version
-  , reqVer = rocket.nodeVersionRequired
-
-if (reqVer && !semver.satisfies(nodeVer, reqVer)) {
-  rocket.error("rocket doesn't work with node " + nodeVer + "\nRequired: node@" + reqVer)
-  return
-}
-
-rocket.commands = {
-  create: function () {
-    if (rocket.argv.length < 1) {
-      rocket.error("A project name is expected when creating a project.");
-      process.exit(1);
-    }
-    console.log(path.join(process.cwd(), rocket.argv[0]));
-    if (path.existsSync(path.join(process.cwd(), rocket.argv[0]))) {
-      rocket.error("The project directory (" + path.join(process.cwd(), rocket.argv[0]) + ") already exists.");
-      process.exit(1);
-    } else {
-      console.log("3 2 1 Take Off! Project " + rocket.argv[0] + " created.");
-      require('child_process').spawn('cp', ['-r', path.join(__dirname, "../templates/default"), path.join(process.cwd(), rocket.argv[0])]);
-    }
-  }
-  , add: function () {
-    try {
-      if (rocket.argv.length < 1) {
-        rocket.error("A page name is expected.");
-        process.exit(1);
+/******************************************************************************
+ * START SERVER
+ */
+ function startServer() {
+ 
+ }
+  
+/******************************************************************************
+ * MAIN
+ */
+  var knownOpts = {
+          'version'     : Boolean
+        , 'help'        : Boolean
+        , 'init'        : String
+        , 'add'         : String
+        , 'info'        : String
+        , 'start'       : Boolean
+        , 'production'  : Boolean 
+        , 'daemon'      : Boolean
+        , 'kill'        : Boolean
       }
-
-      if (!path.existsSync(path.join(process.cwd(), "client"))
-          || !path.existsSync(path.join(process.cwd(), "controllers"))
-          || !path.existsSync(path.join(process.cwd(), "views"))
-          || !path.existsSync(path.join(process.cwd(), "exports"))
-          || !path.existsSync(path.join(process.cwd(), "models"))) {
-        rocket.error("You must be in the project root directory.");
-        process.exit(1);
+    , shortHands = {
+          'v' : ['--version']
+        , 'h' : ['--help']
+        , 'I' : ['--init']
+        , 'a' : ['--add']
+        , 'i' : ['--info']
+        , 's' : ['--start']
+        , 'p' : ['--production']
+        , 'd' : ['--daemon']
+        , 'k' : ['--kill']
+      }
+    , parsed = nopt(knownOpts, shortHands)
+    ;
+  
+  
+  if(parsed.argv.original.length === 0 || parsed.help) {
+    printUsage();
+    return;
+  }else if(parsed.version) {
+    printVersion();
+    return;
+  }else{
+  
+    if(parsed.kill) {
+      killServer();
+    }
+  
+    if(parsed.init) {
+      require('./generators/_project_generator')(parsed.init);
+    }else if(parsed.info) { 
+       try {
+        generator = require('./generators/' + parsed.info + '_generator').info();
+      }catch(err){
+          console.log(('xxx ERROR : [' + parsed.info + '] wrong element type.').red);
+      }
+    }else if(parsed.add) {
+      
+      var generator
+        , args
+        , idx
+        , i
+        , cooked = parsed.argv.cooked
+        ;
+      
+      try {
+        generator = require('./generators/' + parsed.add + '_generator');
+      }catch(err){
+          console.log(('xxx ERROR : [' + parsed.add + '] wrong element type.').red);
       }
       
-      if (path.existsSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"))
-         || path.existsSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"))
-         || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0]))
-         || path.existsSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.jade"))) {
-        rocket.error("Looks like you already have that page!");
-        process.exit(1);
-      }
-
-      fs.writeFileSync(path.join(process.cwd(), "client", "libs", rocket.argv[0] + ".bootstrap.js"), "Put content here.");
-      fs.writeFileSync(path.join(process.cwd(), "controllers", rocket.argv[0] + ".controller.js"), "Put content here.");
-      fs.mkdirSync(path.join(process.cwd(), "views", rocket.argv[0]), 0777);
-      fs.writeFileSync(path.join(process.cwd(), "views", rocket.argv[0], rocket.argv[0] + ".index.jade"), "Put content here.");
-      console.log("The rocket landed. Page " + rocket.argv[0] + " created.");
+      for(
+          idx = i = cooked.indexOf('--add') + 1; 
+          i < cooked.length && cooked[i].substr(0,2) !== '--' ; 
+          i++
+         );
+      
+      args = cooked.slice(idx + 1, i);
+      generator.apply(generator, args);
+    }else if(parsed.start) {
+      startServer({daemon: parsed.daemon, production: parsed.production});
     }
-    catch (err) {
-      rocket.error(err);
-      process.exit(1);
-    }
+    
   }
-  , help: function () {
-    console.log([
-        "Usage: rocket [OPTIONS] ARGUMENTS\n" 
-        , "Arguments:" 
-        , "  create NAME_OF_YOUR_PROJECT    create a rocket project (Shouldn't exist)"
-        , "  add PAGE_NAME                  add a new page to the project (From the root of your project)"
-        , "Options:" 
-        , "  -v, --verbose                  show what's under the rocket." 
-        , "  -h, --help                     show this message." ].join("\n") );
-  }
-}
 
-if (parsed.help) {
-  rocket.argv.unshift(rocket.command)
-  rocket.command = "help"
-}
-
-if (parsed.argv.cooked.length == 0) {
-  rocket.error("No argument given.");
-  rocket.commands.help();
-  return
-}
-
-rocket.log("Running command: " + rocket.command);
-if (! rocket.commands.hasOwnProperty(rocket.command) ) {
-  rocket.error("Unknown command: " + rocket.command);
-  rocket.commands.help();
-  return
-}
-rocket.commands[rocket.command](rocket.argv)
-})()
-
+})();
