@@ -1,8 +1,6 @@
 # Rocket (node-rocket) : The rapid development framework for  node.js-couchDB real-time/comet web applications
 
-  <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
-
-RocketJS.net a.k.a. node-Rocket [1] is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” [2] in order to allow rapid development of comet/real-time web applications using node.js [3] and couchDB [4]. 
+RocketJS.net a.k.a. node-Rocket [1] is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” [2] in order to allow rapid development of comet/real-time web applications using node.js [3] and couchDB [4]. <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
 
 Highly inspired by Ruby on Rails [5] and cakePHP [6], Rocket puts forward the convention over configuration principle [7] in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as couchDB distributed nature. 
 
