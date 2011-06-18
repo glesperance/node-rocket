@@ -28,7 +28,28 @@ Built on top of express -- node.js’ high performance web development framwork 
 ## Installation
 
     $ npm install rocket
-   
+    
+## Usage
+  
+Usage: rocket [command] [argument(s)]
+
+    Options:
+      -v, --version................................Prints RocketJS' version
+      -h, --help...................................Prints this message
+      -p, --prod, --production.....................Set the current environment to be production mode.
+                                                   Default is development. Used in conjunction with --start
+      -d, --daemon.................................Set the server to be started in daemon mode.
+                                                     *** Use --kill to stop the server *** Used in conjunction with --start
+      -k, --kill...................................Kill the server if it is running. Done before --start if used together.
+    
+    Commands:
+      -s, --start..................................Launch current RocketJS project
+      -I, --init [project name]....................Initialize project app
+      -a, --add  [options].........................Add a [type] object to the current project working directory
+                                                     do --info [type] for more info
+      -i, --info [type]............................Prints usage information about [type] object
+      -l, --list...................................Prints the list of all the object types
+
 ## Directory Structure of a Rocket Project
 
     ./
@@ -282,28 +303,3 @@ function in your `./launcher.js` file :
 #### `submit_tag`
 
 ## Plugins
-
-## Usage
-  
-    Usage: rocket [OPTIONS] ARGUMENTS
-
-    Arguments:
-      create NAME_OF_YOUR_PROJECT    create a rocket project (Shouldn't exist)
-      add PAGE_NAME                  add a new page to the project (From the root of your project)
-    Options:
-      -v, --verbose                  show what's under the rocket.
-      -h, --help                     show this message.
-
-
-  To get started you first need to create a new project using the `rocket`
-  command.
-    
-    $ rocket create [Project Name]
-    
-  For example, if you want to create a project named `MyRocketProject` that uses
-  the *default* template you do :
-  
-    $ rocket create MyRocketProject
-   
-  You can also create create new controllers by using the `add` command while being *in your project directory* :
-    $ rocket add pageName
