@@ -1,7 +1,29 @@
-# Rocket (node-rocket) 
+# Rocket (node-rocket)
+##The rapid development framework for  node.js-couchDB real-time/comet web applications
 
-  <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
-  The rapid development framework for node.js web apps.
+<img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
+
+RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of comet/real-time web applications using node.js and couchDB.
+
+Highly inspired by Ruby on Rails and cakePHP, Rocket puts forward the convention over configuration principle in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as couchDB distributed nature. 
+
+Central to RocketJS is the principle of having a single point of contact between the programmer and the underlying application and resources. Hence, RocketJS aims to blur and reduce as much as possible the separation between the client (browser), the server (node.js) and the database (couchDB) while maximizing the scaling potential -- for instance by allowing code sharing between couchDB and the server, and between the server and the client -- and improving the performance of the resulting web application.  
+
+Built on top of express -- node.js’ high performance web development framwork -- RocketJS provides a robust structure on which to build your web applications without sacrificing all any of your freedom.
+
+### RocketJS Features
+* Automatic routing of your controllers
+* Automatic mapping of your views to their corresponding controller
+* Automatic creation of your couchDB databases based on your models’ definitions
+* Automatic synchronization of your couchDB design documents with your server models
+* Automatic document validation based on your model’s schemas via couchDB `validate_doc_update`
+* Easy web-socket / comet application support through dnode
+* Easy server / client code sharing allowing the client to  use CommonJS  `require()` command to import/use server JS libraries
+* High focus on RESTful controller conventions
+* Rails-like `form_tag` and `form_for` form generation
+* View rendering and partials support
+* Connect middleware support
+* Built on top of express
 
 ## Installation
 
