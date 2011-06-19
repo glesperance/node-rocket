@@ -5,12 +5,24 @@
   var fs = require('fs')
     , nopt = require('nopt')
     , colors = require('colors')
+    , path = require('path')
     ;
 
 /******************************************************************************
  * PRINT USAGE
  */
   function printUsage() {
+    
+    var generators = fs.readdirSync(path.join(__dirname, '..', 'libs', 'generators'))
+      , generators_list = ''
+      ;
+    
+    for(var i = 0, len = generators.length; i < len; i++) {
+      if(generators[i].substr(0,1) !== '_') {
+        generators_list += generators[i].split('_')[0] + ' ';
+      }
+    }
+  
     console.log(
         [
           ''
@@ -31,7 +43,8 @@
         , '  -a, --add  [options].........................Add a [type] object to the current project working directory'
         , '                                                 do --info [type] for more info'
         , '  -i, --info [type]............................Prints usage information about [type] object'
-        , '  -l, --list...................................Prints the list of all the object types'
+        , ''
+        , 'Available object types: ' + generators_list
         , ''
         ].join('\n') 
     );
@@ -78,6 +91,7 @@
         , 'production'  : Boolean 
         , 'daemon'      : Boolean
         , 'kill'        : Boolean
+        , 'no-view'     : Boolean
       }
     , shortHands = {
           'v' : ['--version']
@@ -99,7 +113,7 @@
     return;
   }else if(parsed.version) {
     printVersion();
-    return;
+    return; 
   }else{
   
     if(parsed.kill) {
@@ -107,13 +121,11 @@
     }
   
     if(parsed.init) {
-      require('./generators/_project_generator')(parsed.init);
-    }else if(parsed.info) { 
-       try {
-        generator = require('./generators/' + parsed.info + '_generator').info();
-      }catch(err){
-          console.log(('xxx ERROR : [' + parsed.info + '] wrong element type.').red);
-      }
+      require('../libs/generators/_project_generator')(parsed.init);
+    }else if(parsed.info) {
+    
+        generator = require('../libs/generators/' + parsed.info + '_generator/').info();
+      
     }else if(parsed.add) {
       
       var generator
@@ -124,7 +136,7 @@
         ;
       
       try {
-        generator = require('./generators/' + parsed.add + '_generator');
+        generator = require('../libs/generators/' + parsed.add + '_generator');
       }catch(err){
           console.log(('xxx ERROR : [' + parsed.add + '] wrong element type.').red);
       }
@@ -136,6 +148,8 @@
          );
       
       args = cooked.slice(idx + 1, i);
+      args.push((typeof parsed.view === 'undefined' ? true : parsed.view));
+      
       generator.apply(generator, args);
     }else if(parsed.start) {
       startServer({daemon: parsed.daemon, production: parsed.production});
