@@ -40,7 +40,7 @@ function projectGenerator(projectName) {
   }
   
   if(exists){
-    console.log(('xxx WARNING: directory exists [' + projectPath + '] please provide another project name of use the --force option').yellow);
+    console.log(('xxx WARNING: directory exists [' + projectPath + '] please provide another project name or remove the offending directory before proceeding').yellow);
     process.exit(1);
   }
   
@@ -50,10 +50,6 @@ function projectGenerator(projectName) {
     , function b(){ child_process.exec(['cd', __dirname, ';', 'cp -v -R', path.join('templates', DEFAULT), projectPath].join(' '), printExec); }
     );
   
-}
-
-projectGenerator.info = function projectGeneratorInfo() {
-
 }
 
 module.exports = projectGenerator;
