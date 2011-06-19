@@ -36,19 +36,15 @@ Built on top of express -- node.js’ high performance web development framwork 
     Options:
       -v, --version................................Prints RocketJS' version
       -h, --help...................................Prints this message
-      -p, --prod, --production.....................Set the current environment to be production mode.
-                                                   Default is development. Used in conjunction with --start
-      -d, --daemon.................................Set the server to be started in daemon mode.
                                                      *** Use --kill to stop the server *** Used in conjunction with --start
-      -k, --kill...................................Kill the server if it is running. Done before --start if used together.
     
     Commands:
-      -s, --start..................................Launch current RocketJS project
       -I, --init [project name]....................Initialize project app
       -a, --add  [options].........................Add a [type] object to the current project working directory
                                                      do --info [type] for more info
       -i, --info [type]............................Prints usage information about [type] object
-      -l, --list...................................Prints the list of all the object types
+    
+    Available object types: controller 
 
 ## Directory Structure of a Rocket Project
 
