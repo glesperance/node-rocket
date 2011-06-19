@@ -31,7 +31,7 @@ Built on top of express -- node.js’ high performance web development framwork 
     
 ## Usage
   
-Usage: rocket [command] [argument(s)]
+    Usage: rocket [command] [argument(s)]
 
     Options:
       -v, --version................................Prints RocketJS' version
