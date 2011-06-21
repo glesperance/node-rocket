@@ -12,7 +12,9 @@ var crypto = require('crypto')
   ;
  
 var oo = require('../utils/oo')
-  , BaseResource = require('./base_resource');
+  , namespace = require('../utils/namespace')
+  , BaseResource = require('./base_resource')
+  ;
 
 /******************************************************************************
  * CONSTANTS
@@ -100,7 +102,7 @@ CouchDBResource._security = {
       , roles: []
       }
   , readers: {
-        names: []
+        names: ["admin"]
       , roles: []
       }  
   };
@@ -120,7 +122,7 @@ CouchDBResource.prototype = {
  * Resource Factory/Constructor Functions
  */
 var factoryFunctions = {
-    initialize: function initialize_CouchDBResource(callback) {
+    initialize: function initialize_CouchDBResource(model_name, callback) {
       var that = this;
     
       //Initialize connection object
@@ -129,13 +131,13 @@ var factoryFunctions = {
         , that.connection.port
         , that.connection.options
         );
-      
-      //Infer DB name from file name
-      if(typeof that.name == 'undefined') {
-        throw 'xxx ERROR Model.type is undefined';
+        
+      //Infer DB name from file name unless specified
+      if(typeof that.db_name !== 'undefined' && that.db_name !== null){ 
+        that.__db_name = that.db_name;
+      }else{
+        that.__db_name = lingo.en.pluralize(model_name).toLowerCase();
       }
-      
-      that.__db_name = lingo.en.pluralize(that.name).toLowerCase();
       
       //setup db object
       that.__db = this.__connection.database(that.__db_name);
@@ -246,7 +248,7 @@ var factoryFunctions = {
       this.__db.view('rocket/all', callback);
     }
   , view: function view_CouchDBResource() {
-      this.__db.view.apply(this, arguments);
+      this.__db.view.apply(this.__db, arguments);
     }
   };
 

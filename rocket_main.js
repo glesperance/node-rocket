@@ -5,12 +5,14 @@ var fs        = require("fs")
   , dnode     = require("dnode")
   , colors    = require('colors')
   , path      = require('path')
+  , lingo     = require('lingo')
   ;
   
 var extractName = require('./libs/utils/namespace').extractName
   , checkName = require('./libs/utils/namespace').checkName
   , oo = require('./libs/utils/oo')
-  , views_filters = require('./libs/views/filters');
+  , views_filters = require('./libs/views/filters')
+  ;
   
 /******************************************************************************
  * OPTIONS
@@ -216,6 +218,8 @@ function setupControllers(app) {
     if(name === 'root') {
       resource = app.resource(wrapped_funcs);
     } else {
+      name = lingo.camelcase(name.replace(/_/g, ' '));
+      
       resource = app.resource(name, wrapped_funcs);
     }
   
@@ -320,8 +324,14 @@ function setupModels(app) {
     if(models_files[i] === DATASOURCES_DIR_NAME || models_files[i] === 'empty') {
       continue;
     }
-    var myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, models_files[i]));
-    myModel.initialize();
+    var model_filename = models_files[i]
+      , model_name = extractName(model_filename, {extension: true})
+      , myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, model_filename))
+      ;
+    if(!lingo.en.isSingular(model_name)) {
+      throw ('xxx ERROR model filename must be singular [' + model_name + ']').red
+    }
+    myModel.initialize(model_name);
   }
 }
 
@@ -410,8 +420,15 @@ var rocket = {
     version: package_info.version
   , resources: require('./libs/resources')
   , utils: require('./libs/utils')
-  , createServer: function createServer_rocket(app_dir) {
-      var app = express.createServer();
+  , createServer: function createServer_rocket() {
+      var args = Array.prototype.slice.call(arguments)
+        , app_dir =  args.shift()
+        , app = express.createServer()
+        , middlewares = Array.prototype.slice.call(arguments,1)
+        ;
+      
+        
+      //middlewares.shift();
       
       app.rocket = {};
       app.rocket.routes = [];
@@ -420,18 +437,17 @@ var rocket = {
       app.rocket.app_dir = app_dir;
       
       //replace listen on app
-      var express_listen = app.listen;
+      var express_listen = app.listen;      
       app.listen = function () {
+      
         var ret = express_listen.apply(this, arguments);
+        
         if(missing.indexOf(EXPORT_DIR_NAME) === -1 ) {
           app.rocket.dnode.listen(app);
         }
+                
         return ret;
       }
-      
-      //extend the jade engine with our filters
-      var jade = require('jade');
-      oo.__extends(jade.filters, views_filters);
       
       //default configuration
       app.configure(function() {
@@ -439,18 +455,21 @@ var rocket = {
         app.set("views", path.join(app.rocket.app_dir, VIEWS_DIR_NAME));
         app.register(".jade", jade);
         
-        app.use(express.methodOverride());
-        
         app.use('/static', express.static(path.join(app.rocket.app_dir, CLIENT_STATIC_DIR)));
+        
+        app.use(express.methodOverride());
         app.use(express.bodyParser());
         app.use(express.cookieParser());
-        app.use(require('browserify')({
-            base : [path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
-          , mount : '/browserify.js'
-          , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
-          , require: ['underscore', 'dnode']
-          }));
+        
+       for(var i = 0, len = middlewares.length; i < len; i++) {
+          app.use(middlewares[i]);
+        }
+        
       });
+      
+      //extend the jade engine with our filters
+      var jade = require('jade');
+      oo.__extends(jade.filters, views_filters);
       
       //setup controllers
       setupControllers(app);
