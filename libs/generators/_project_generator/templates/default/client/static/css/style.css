@@ -150,7 +150,7 @@ button {  width: auto; overflow: visible; }
 
 body, select, input, textarea {
   /* #444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
-  color: #F8F8F8;
+  color: #444;
   /* Set your base font here, to apply evenly */
   /* font-family: Georgia, serif;  */
 }
@@ -175,16 +175,16 @@ a:hover { color: #036; }
 }
 
 #logo h3 {
-  color: #333;
+  color: #444;
   font-size: 34px;
 }
 
 #logo textarea {
   width: 75%;
   height: 250px;
-  background: #333;	
 }
 
+#logo form .text-field { width: 70%; }
 
 
 

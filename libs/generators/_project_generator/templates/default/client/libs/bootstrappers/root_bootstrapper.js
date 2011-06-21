@@ -1,6 +1,6 @@
-var default_bootstraper = require("./base_bootstraper");
+var dnode = require('dnode')
+  , remote
+  ;
+  
+dnode.connect(function(r) { remote = r; });
 
-exports.bootstrap = function() {
-	console.log("--- In root_bootstraper ! Hello world !");
-	default_bootstraper.bootstrap();
-}

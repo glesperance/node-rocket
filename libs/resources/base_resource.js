@@ -44,6 +44,11 @@ BaseResource.validators = {
         throw({ invalid: 'The email address you entered is invalid' });
       }
     }
+  , Boolean: function(obj) {
+      if(obj !== 'true' || obj !== 'false') {
+        throw({ invalid: 'Value required to be either \'true\' or \'false\''});
+      }
+    }
   , Date: function(obj) {
     }
   };
