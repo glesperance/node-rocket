@@ -449,6 +449,10 @@ var rocket = {
         return ret;
       }
       
+      //extend the jade engine with our filters
+      var jade = require('jade');
+      //oo.__extends(jade.filters, views_filters);
+      
       //default configuration
       app.configure(function() {
         app.set("view engine", 'jade');
@@ -461,15 +465,18 @@ var rocket = {
         app.use(express.bodyParser());
         app.use(express.cookieParser());
         
+        app.use(require('browserify')({
+            base : [path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
+          , mount : '/browserify.js'
+          , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
+          , require: ['underscore', 'dnode']
+          }));
+        
        for(var i = 0, len = middlewares.length; i < len; i++) {
           app.use(middlewares[i]);
         }
         
       });
-      
-      //extend the jade engine with our filters
-      var jade = require('jade');
-      oo.__extends(jade.filters, views_filters);
       
       //setup controllers
       setupControllers(app);
