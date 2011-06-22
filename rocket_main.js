@@ -13,11 +13,6 @@ var extractName = require('./libs/utils/namespace').extractName
   , oo = require('./libs/utils/oo')
   , views_filters = require('./libs/views/filters')
   ;
-  
-/******************************************************************************
- * OPTIONS
- */
-var USE_UGLIFY_JS = false;
 
 /******************************************************************************
  * CONSTANTS
@@ -468,7 +463,6 @@ var rocket = {
         app.use(require('browserify')({
             base: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)
           , mount : '/browserify.js'
-          , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
           , require: ['dnode', 'underscore']
           }));
 
