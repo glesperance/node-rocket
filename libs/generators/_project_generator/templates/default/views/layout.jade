@@ -47,7 +47,7 @@ body
   -if (typeof controller !== 'undefined')
     !="<script>"
     !="var boot_options, Bootstrapper = require('./bootstrappers/" + controller + "_bootstrapper');"
-    -if (typeof boot_options != 'undefined' && boot_options != null)
+  -if (typeof boot_options != 'undefined' && boot_options != null)
       !="boot_options = " + JSON.stringify(boot_options) + ";"
     !="Bootstrapper.bootstrap(boot_options);"
     !="</script>"
@@ -59,6 +59,14 @@ body
   
   // asynchronous google analytics: mathiasbynens.be/notes/async-analytics-snippet change the UA-XXXXX-X to be your site's ID 
   
+  -if (typeof controller !== 'undefined')
+    !="<script>"
+    !="var init_options, client = require('./" + controller + "_client');"
+    -if (typeof init_options != 'undefined' && init_options != null)
+      !="init_options = " + JSON.stringify(init_options) + ";"
+    !="client.init(init_options);"
+    !="</script>"
+    
   script(type='text/javascript')
     var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
     (function(d, t) {
