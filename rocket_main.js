@@ -466,10 +466,9 @@ var rocket = {
         app.use(express.cookieParser());
         
         app.use(require('browserify')({
-            base : [path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
-          , mount : '/browserify.js'
+            mount : '/browserify.js'
           , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
-          , require: ['underscore', 'dnode']
+          , require: ['dnode', 'underscore', path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
           }));
         
        for(var i = 0, len = middlewares.length; i < len; i++) {
