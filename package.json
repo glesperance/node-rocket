@@ -21,7 +21,7 @@
     , "jade" : ">= 0.6.3"
     , "underscore" : ">= 1.1.4"
     , "dnode" : ">= 0.6.8"
-    , "browserify" : ">= 0.3.1"
+    , "browserify" : "= 1.0.0"
     , "uglify-js" : ">= 1.0.1"
     , "coffee-script" : ">= 1.0.1"
     , "express-resource" : ">= 0.2.0"

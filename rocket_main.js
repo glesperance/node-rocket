@@ -464,13 +464,14 @@ var rocket = {
         app.use(express.methodOverride());
         app.use(express.bodyParser());
         app.use(express.cookieParser());
-        
+
         app.use(require('browserify')({
-            mount : '/browserify.js'
+            base: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)
+          , mount : '/browserify.js'
           , filter:  (USE_UGLIFY_JS ? uglifyFilter : undefined)
-          , require: ['dnode', 'underscore', path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)]
+          , require: ['dnode', 'underscore']
           }));
-        
+
        for(var i = 0, len = middlewares.length; i < len; i++) {
           app.use(middlewares[i]);
         }
