@@ -44,15 +44,29 @@ function __deepExtends(child, parent, options) {
       }
     
       //if the current prop is an object, and is not `null` we recurse
-      if(typeof parent[prop] === 'object' && parent[prop] !== null) {        
+      if(typeof parent[prop] === 'object' 
+      && parent[prop] !== null 
+      && !Array.isArray(parent[prop])
+      && typeof parent[prop] === dst[prop]
+      )
+      {        
         dst[prop] = dst[prop] || new parent[prop].constructor();
         dst[prop] = arguments.callee(dst[prop], parent[prop], options);
       }else{
         /**
          * if the prop is *not* an object (or is null)
          * copy it in the child if it doesn't already exists
-         */
-        dst[prop] = (!options.overwrite && typeof dst[prop] !== 'undefined' ? dst[prop] : parent[prop]);
+         */  
+        if(typeof parent[prop] === 'object' 
+        && parent[prop] !== null 
+        && Array.isArray(parent[prop])
+        && Array.isArray(dst[prop])
+        )
+        {
+          dst[prop] = dst[prop].concat(parent[prop]);
+        }else{
+          dst[prop] = (!options.overwrite && typeof dst[prop] !== 'undefined' ? dst[prop] : parent[prop]);
+        }
       }
     }
   }
