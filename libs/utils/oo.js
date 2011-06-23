@@ -64,11 +64,16 @@ function __deepExtends(child, parent, options) {
         )
         { 
           
-          if(typeof dst[prop] === 'undefined' || dst[prop] === null || options.overwrite === true){
+          if( !Array.isArray(dst[prop]) && 
+              ( typeof dst[prop] === 'undefined' 
+              || dst[prop] === null 
+              || options.overwrite === true
+              )
+          ){
             dst[prop] = [];
           }
               
-          if( Array.isArray(dst[prop]) ) {
+          if(Array.isArray(dst[prop])) {
           
             for(var i = 0, ii = parent[prop].length; i < ii; i++) {
               dst[prop].push(arguments.callee({}, parent[prop][i], options));
