@@ -57,6 +57,7 @@ function __deepExtends(child, parent, options) {
          * if the prop is *not* an object (or is null)
          * copy it in the child if it doesn't already exists
          */  
+        
         if(typeof parent[prop] === 'object' 
         && parent[prop] !== null 
         && Array.isArray(parent[prop])
@@ -79,7 +80,7 @@ exports.__deepExtends = __deepExtends;
 
 function inherits(child, parent) {
   
-  ///copy all memebrs of parents to this (the child)
+  ///copy all members of parents to this (the child)
   __deepExtends(child, parent);
   
   //constructor helper
@@ -96,7 +97,7 @@ function inherits(child, parent) {
   // (2) child.prototype.__proto__   = obj.__proto__ 
   //                                 = ctor.prototype 
   //                                 = parent.prototype
-  child.prototype = new ctor;
+  child.prototype = __deepExtends(new ctor, child.prototype, {overwrite: true});
   
   //save the parent's prototype for direct future reference
   child.__super__ = parent.prototype.constructor;
