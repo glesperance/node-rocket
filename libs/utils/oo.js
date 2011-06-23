@@ -37,7 +37,7 @@ function __deepExtends(child, parent, options) {
       var dst;
       
       if(options.copyOnWrite) {
-        child_copy = child_copy || exports.__extends({}, child);
+        child_copy = child_copy || __extends({}, child);
         dst = child_copy;
       }else{
         dst = child;
