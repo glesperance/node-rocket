@@ -48,8 +48,8 @@ CouchDBResource.ddocs = [
           var oo  = require('rocket/oo')
             , obj = req.form || req.query 
             ;
-          oo.__extends(doc, obj, { overwrite: true });
-          return [doc, '']
+          //oo.__extends(doc, obj, { overwrite: true });
+          return [doc, "Hwllo"];
         }
       }
     , validate_doc_update: function(newDoc, oldDoc, userCtx) {
@@ -81,7 +81,7 @@ CouchDBResource.ddocs = [
             if(typeof newDoc[member] !== 'undefined'
             && newDoc[member] !== null) {
               if(validator) {
-                validator(newDoc[member]);
+                validator(member, newDoc[member]);
               }else{
                 continue;
               }
@@ -164,6 +164,10 @@ CouchDBResource.prototype = {
         , that = this
         ;
       for(var k in this) {
+        if(this.propertyIsEnumerable(k) === false) {
+          continue;
+        }
+        
         if(! this.synced[k]) {
           modz[k] = this[k];
         }
