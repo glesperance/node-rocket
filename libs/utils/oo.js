@@ -61,12 +61,19 @@ function __deepExtends(child, parent, options) {
         if(typeof parent[prop] === 'object' 
         && parent[prop] !== null 
         && Array.isArray(parent[prop])
-        && Array.isArray(dst[prop])
         )
         { 
-          for(var i = 0, ii = parent[prop].length; i < ii; i++) {
-            dst[prop].push(arguments.callee(parent[prop][i].constructor(), parent[prop][i], options));
+          
+          if(typeof dst[prop] === 'undefined' || dst[prop] === null || options.overwrite === true){
+            dst[prop] = [];
           }
+              
+          if( Array.isArray(dst[prop]) ) {
+          
+            for(var i = 0, ii = parent[prop].length; i < ii; i++) {
+              dst[prop].push(arguments.callee({}, parent[prop][i], options));
+            }
+          }          
         }else{
           dst[prop] = (!options.overwrite && typeof dst[prop] !== 'undefined' ? dst[prop] : parent[prop]);
         }
