@@ -150,7 +150,7 @@ CouchDBResource.prototype = {
     save: function save_CouchDBResourceInstance(callback) {
       var that = this
       ;
-      CouchDBResource.__db.save(this._id, this._rev, this, function(err,res) {
+      this.__db.save(this._id, this._rev, this, function(err,res) {
         if(err){
           callback(err);
         }else{
@@ -192,6 +192,7 @@ CouchDBResource.prototype = {
         if(err) {
           callback(err);
         }else{
+        
           setProperties(that, doc);
           callback(null, that);
         }        
@@ -207,7 +208,6 @@ CouchDBResource.prototype = {
 var factoryFunctions = {
     initialize: function initialize_CouchDBResource(model_name, callback) {
       var that = this;
-    
       //Initialize connection object
       that.__connection = new cradle.Connection(
           that.connection.host
@@ -223,11 +223,11 @@ var factoryFunctions = {
       }
       
       //setup db object
-      that.__db = this.__connection.database(that.__db_name);
+      that.__db = that.__connection.database(that.__db_name);
       that.prototype.__db  = that.__db;
       
       //Create db if it doesn't exists. Harmless otherwise.
-      that.__db.create();      
+      that.__db.create();
       
       async.parallel(
           [function(callback) {
@@ -241,7 +241,7 @@ var factoryFunctions = {
         
       
       function fctToString(obj) {
-        for(var key in obj) {
+       for(var key in obj) {
           if(typeof obj[key] === 'function') {
             obj[key] = obj[key].toString();
           }else if(typeof obj[key] === 'object' && obj[key] !== null) {
@@ -256,22 +256,16 @@ var factoryFunctions = {
         docObj[ROCKET_NAMESPACE] = {};
       
         //add the validators to the design doc
-        docObj[ROCKET_NAMESPACE].validators = that.validators;
+        docObj[ROCKET_NAMESPACE].validators = oo.__extends({}, that.validators);
         
         //add the schema to the deisng doc
-        docObj[ROCKET_NAMESPACE].schema  = that.schema;
-              
+        docObj[ROCKET_NAMESPACE].schema  = 'module.exports = ' + JSON.stringify(that.schema);
+        
         //remove previous digest
         delete docObj.digest;
         
         //convert all functions to strings
         fctToString(docObj);
-        
-        //convert the schema to string
-        docObj[ROCKET_NAMESPACE].schema = JSON.stringify(docObj[ROCKET_NAMESPACE].schema);
-        
-        //make the schema available through commonJS' `require`
-        docObj[ROCKET_NAMESPACE].schema = 'module.exports = ' + docObj[ROCKET_NAMESPACE].schema;
         
         //make all validators available through commonJS' `require`
         for(var f in docObj[ROCKET_NAMESPACE].validators) {
@@ -294,6 +288,7 @@ var factoryFunctions = {
         that.get(docObj._id, checkAndUpdate);
         
         function checkAndUpdate(err, doc) {
+        
           if(err) {
             if(err.error === 'not_found'){
               that.__db.save(docObj._id, docObj, callback);

@@ -37,7 +37,7 @@ function __deepExtends(child, parent, options) {
       var dst;
       
       if(options.copyOnWrite) {
-        child_copy = child_copy || __extends({}, child);
+        child_copy = child_copy || exports.__extends({}, child);
         dst = child_copy;
       }else{
         dst = child;
@@ -63,8 +63,10 @@ function __deepExtends(child, parent, options) {
         && Array.isArray(parent[prop])
         && Array.isArray(dst[prop])
         )
-        {
-          dst[prop] = dst[prop].concat(parent[prop]);
+        { 
+          for(var i = 0, ii = parent[prop].length; i < ii; i++) {
+            dst[prop].push(arguments.callee(parent[prop][i].constructor(), parent[prop][i], options));
+          }
         }else{
           dst[prop] = (!options.overwrite && typeof dst[prop] !== 'undefined' ? dst[prop] : parent[prop]);
         }
@@ -100,9 +102,8 @@ function inherits(child, parent) {
   child.prototype = __deepExtends(new ctor, child.prototype, {overwrite: true});
   
   //save the parent's prototype for direct future reference
-  child.__super__ = parent.prototype.constructor;
+  child.__super__ = parent;
   child.prototype.__super__ = parent.prototype;
-  
 };
 
 exports.inherits = inherits;
