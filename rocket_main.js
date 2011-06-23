@@ -326,7 +326,8 @@ function setupModels(app) {
     if(!lingo.en.isSingular(model_name)) {
       throw ('xxx ERROR model filename must be singular [' + model_name + ']').red
     }
-    myModel.initialize(model_name);
+    
+    myModel.initialize.call(myModel, model_name);
   }
 }
 
