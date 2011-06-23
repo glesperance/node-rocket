@@ -25,28 +25,28 @@ BaseResource.prototype = {
  * Validation functions
  */
 BaseResource.validators = {
-    AlphaNumeric: function(obj) {
+    AlphaNumeric: function(name, obj) {
       var regexp = new RegExp('^[A-Z0-9]+$', 'i');
       if(! regexp.test(obj)) {
-        throw({ invalid: 'Alpha-Numeric string expected'});
+        throw({ invalid: name + ': Alpha-Numeric string expected got ' + obj});
       }
     }
-  , Integer: function(obj) {
+  , Integer: function(name, obj) {
       var regexp = new RegExp('^(-)?[0-9]+$');
       if(! regexp.test(obj.toString())) {
-        throw({ invalid: 'Integer expected'});
+        throw({ invalid: name + ': Integer expected got ' + obj});
       }
     }
-  , Email: function(obj) {
+  , Email: function(name, obj) {
       var r = new RegExp('^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}', 'i');
       
       if(! r.test(obj)) {
-        throw({ invalid: 'The email address you entered is invalid' });
+        throw({ invalid: name + ': The email address you entered is invalid got ' + obj });
       }
     }
-  , Boolean: function(obj) {
+  , Boolean: function(name, obj) {
       if(obj !== 'true' || obj !== 'false') {
-        throw({ invalid: 'Value required to be either \'true\' or \'false\''});
+        throw({ invalid: name + ': Value required to be either \'true\' or \'false\' got ' + obj});
       }
     }
   , Date: function(obj) {
