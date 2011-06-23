@@ -342,8 +342,8 @@ oo.__extends(CouchDBResource, factoryFunctions, {overwrite: true});
 /******************************************************************************
  * CouchDBResource's Constructor
  */
-function CouchDBResource() {
-  arguments.callee.__super__.apply(this, arguments);
+function CouchDBResource(obj) {
+  setProperties(this, obj);
 };
 
 oo.inherits(CouchDBResource, BaseResource);
