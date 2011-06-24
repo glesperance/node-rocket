@@ -46,10 +46,10 @@ CouchDBResource.ddocs = [
     , updates: {
         in_place: function(doc, req) {
           var oo  = require('rocket/oo')
-            , obj = req.form || req.query 
             ;
-          //oo.__extends(doc, obj, { overwrite: true });
-          return [doc, "Hwllo"];
+          oo.__extends(doc, req.query, { overwrite: true });
+          
+          return [doc, JSON.stringify(doc)];
         }
       }
     , validate_doc_update: function(newDoc, oldDoc, userCtx) {
@@ -145,6 +145,11 @@ function setProperties(dst, src, synced){
     dst.values[prop] = val;
   }
 }
+
+function updateCache(obj, newValues) {
+  obj.__db.cache.store[obj._id].document = newValues;
+  obj.__db.cache.store[obj._id].attime = Date.now();
+}
  
 CouchDBResource.prototype = {
     save: function save_CouchDBResourceInstance(callback) {
@@ -179,6 +184,7 @@ CouchDBResource.prototype = {
             callback(err);
           }else{
             setProperties(that, that);
+            updateCache(that, that.values);
             callback.apply(that, Array.prototype.slice.apply(arguments));
           }
         });
