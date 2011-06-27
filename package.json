@@ -19,7 +19,7 @@
       "express"           : ">= 1.0.7"
     , "nopt"              : ">= 1.0.5"
     , "jade"              : ">= 0.6.3"
-    , "dnode"             : "= 0.7.3"
+    , "dnode"             : "= 0.7.2"
     , "browserify"        : "= 1.0.0"
     , "coffee-script"     : ">= 1.0.1"
     , "lingo"             : ">= 0.0.4"
