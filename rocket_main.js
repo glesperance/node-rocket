@@ -464,7 +464,7 @@ var rocket = {
         app.use(require('browserify')({
             base: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)
           , mount : '/browserify.js'
-          , require: ['dnode', 'underscore']
+          , require: ['dnode', 'underscore', 'traverse']
           }));
 
        for(var i = 0, len = middlewares.length; i < len; i++) {
