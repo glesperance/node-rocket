@@ -28,8 +28,9 @@ var MODELS_DIR_NAME        = 'models'
   , DATASOURCES_DIR_NAME   = 'datasources'
   
   /* client specific dirs */
-  , CLIENT_LIBS_DIR = path.join(CLIENT_DIR_NAME, 'libs')
-  , CLIENT_STATIC_DIR = path.join(CLIENT_DIR_NAME, 'static')
+  , CLIENT_LIBS_DIR             = path.join(CLIENT_DIR_NAME, 'libs')
+  , CLIENT_STATIC_DIR           = path.join(CLIENT_DIR_NAME, 'static')
+  , CLIENT_LIBS_INDEX_FILENAME  = '_rocket_libs_index.js'
   
   /* namespace constants */
   , CONTROLLER_SUFFIX = '_controller'
@@ -394,20 +395,92 @@ function compileExports(app) {
 }
 
 /******************************************************************************
- * UTILITY FUNCTIONS
+ * LIBS INDEX BUILDER
  */
-function uglifyFilter(orig_code) {
-  var jsp = require("uglify-js").parser
-    , pro = require("uglify-js").uglify
-    , ast = jsp.parse(orig_code); // parse code and get the initial AST
+
+function build_libs_index(app_dir) {
+  var libs_dir_path   = path.join(app_dir, CLIENT_LIBS_DIR)
+    , libs_index_file = path.join(libs_dir_path, CLIENT_LIBS_INDEX_FILENAME)
+    , libs_index
+    , modified = false
+    , buf = []
+    ;
+  
+  try {
+    libs_index = require(libs_index_file);
+  } catch(err) {
+      libs_index = [];
+  }
+  
+  function walkAST(dir, root) {
+    var client_files = fs.readdirSync(dir);
     
-  ast = pro.ast_mangle(ast);      // get a new AST with mangled names
-  ast = pro.ast_squeeze(ast);     // get an AST with compression optimizations
-  return pro.gen_code(ast);       // compressed code here
-};
+    for(var i = 0, ii = client_files.length; i < ii; i++) {
+      var filename = client_files[i]
+        , stat = fs.statSync(path.join(dir, filename))
+        ;
+        if(filename.slice(0,1) === '.' || filename.slice(0,1) === '_') {
+          continue;
+        }else if(stat.isDirectory()){
+          arguments.callee.call(this, path.join(libs_dir_path, root, filename), filename);
+        }else{
+          var include_path = path.join(root,filename);
+          
+          if(libs_index.indexOf(include_path) === -1) {
+            modified = true;
+            libs_index.push(['./', include_path].join(''));
+          }
+        }        
+    }
+  }
+  
+  walkAST(libs_dir_path);
+  
+  if(modified) {
+  
+    buf.push(
+      [ 'module.exports'
+      , '='
+      , '(function() {'
+      ].join(' ')
+    );
+    
+    var nest = '  ';
+    
+    buf.push([nest, 'if(false) {'].join(''));
+    nest = '    ';
+    
+    for(var i = 0, ii = libs_index.length; i < ii; i++) {
+      buf.push(
+        [ nest
+        , 'require(\''
+        , libs_index[i]
+        , '\');'
+        ].join('')
+      );
+    }
+    
+    nest = '  ';
+    
+    buf.push([nest, '}'].join(''));
+    
+    buf.push(
+      [ nest
+      , [ 'return'
+        , JSON.stringify(libs_index) + ';'
+        ].join(' ')
+      ].join('')
+    );
+    
+    buf.push('})();');
+    
+    fs.writeFileSync(libs_index_file, buf.join('\n'));
+    
+  }
+}
 
 /******************************************************************************
- * EXPORTS
+ * MAIN
  */
 var package_JSON = fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'); 
 var package_info = JSON.parse(package_JSON);
@@ -422,9 +495,6 @@ var rocket = {
         , app = express.createServer()
         , middlewares = Array.prototype.slice.call(arguments,1)
         ;
-      
-        
-      //middlewares.shift();
       
       app.rocket = {};
       app.rocket.routes = [];
@@ -447,7 +517,9 @@ var rocket = {
       
       //extend the jade engine with our filters
       var jade = require('jade');
-      //oo.__extends(jade.filters, views_filters);
+
+      //build _rocket_index for browserify
+      build_libs_index(app.rocket.app_dir);
       
       //default configuration
       app.configure(function() {
@@ -462,9 +534,8 @@ var rocket = {
         app.use(express.cookieParser());
 
         app.use(require('browserify')({
-            base: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR)
-          , mount : '/browserify.js'
-          , require: ['dnode', 'underscore', 'traverse']
+            mount : '/browserify.js'
+          , require: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR, CLIENT_LIBS_INDEX_FILENAME)
           }));
 
        for(var i = 0, len = middlewares.length; i < len; i++) {
