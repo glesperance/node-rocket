@@ -516,6 +516,12 @@ var rocket = {
       
       //extend the jade engine with our filters
       var jade = require('jade');
+      
+      app.browserify = require('browserify')({
+        mount : '/browserify.js'
+      , require: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR, CLIENT_LIBS_INDEX_FILENAME)
+      , watch: true
+      });
 
       //build _rocket_index for browserify
       build_libs_index(app.rocket.app_dir);
@@ -532,11 +538,7 @@ var rocket = {
         app.use(express.bodyParser());
         app.use(express.cookieParser());
 
-        app.use(require('browserify')({
-            mount : '/browserify.js'
-          , require: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR, CLIENT_LIBS_INDEX_FILENAME)
-          //, filter : require('uglify-js')
-          }));
+        app.use(app.browserify);
 
        for(var i = 0, len = middlewares.length; i < len; i++) {
           app.use(middlewares[i]);
