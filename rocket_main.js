@@ -28,7 +28,7 @@ var MODELS_DIR_NAME        = 'models'
   , DATASOURCES_DIR_NAME   = 'datasources'
   
   /* client specific dirs */
-  , CLIENT_LIBS_DIR             = path.join(CLIENT_DIR_NAME, 'libs')
+  , CLIENT_LIBS_DIR             = path.join(CLIENT_DIR_NAME, 'js')
   , CLIENT_STATIC_DIR           = path.join(CLIENT_DIR_NAME, 'static')
   , CLIENT_LIBS_INDEX_FILENAME  = '_rocket_libs_index.js'
   
@@ -424,11 +424,11 @@ function build_libs_index(app_dir) {
         }else if(stat.isDirectory()){
           arguments.callee.call(this, path.join(libs_dir_path, root, filename), filename);
         }else{
-          var include_path = path.join(root,filename);
+          var include_path = ['./', path.join(root,filename)].join('');
           
           if(libs_index.indexOf(include_path) === -1) {
             modified = true;
-            libs_index.push(['./', include_path].join(''));
+            libs_index.push(include_path);
           }
         }        
     }
@@ -475,7 +475,6 @@ function build_libs_index(app_dir) {
     buf.push('})();');
     
     fs.writeFileSync(libs_index_file, buf.join('\n'));
-    
   }
 }
 
@@ -536,6 +535,7 @@ var rocket = {
         app.use(require('browserify')({
             mount : '/browserify.js'
           , require: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR, CLIENT_LIBS_INDEX_FILENAME)
+          //, filter : require('uglify-js')
           }));
 
        for(var i = 0, len = middlewares.length; i < len; i++) {
