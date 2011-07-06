@@ -71,26 +71,43 @@ CouchDBResource.ddocs = [
           
             var validator;
             var optional;
+            var prefix;
             
             if(typeof schema[member] === 'string') {
             
               validator = require('rocket/validators/' + schema[member]) || null;
               
             }else if(typeof schema[member] === 'object') {
-            
+              
+              alias = schema[member].alias;
+              prefix = schema[member].prefix;
               optional = schema[member].optional;
               validator = (schema[member].validate ? require('rocket/validators/' + schema[member].validate) : null);
               
             }
             
-            if(typeof newDoc[member] !== 'undefined'
-            && newDoc[member] !== null) {
+            var value = newDoc[member];
+            
+            if(typeof value !== 'undefined'
+            && value !== null) {
+              if(alias) {
+                throw({ invalid: member + ' is an alias. Aliases must not be saved in DB.' });
+              }
+            
+              if(prefix) {
+                if(value.substr(0, prefix.length) !== prefix) {
+                  throw({ invalid: member + ' must have prefix [' + prefix + ']' });
+                }else{
+                  value = value.substr(prefix.length);
+                }
+              }
+              
               if(validator) {
-                validator(member, newDoc[member]);
+                validator(member, value);
               }else{
                 continue;
               }
-            }else if(optional){
+            }else if(optional || alias){
               continue;
             }else{
               throw({ invalid: member + ' can\'t be missing or null' });
