@@ -3,7 +3,8 @@ module.exports = {
     var options = options || {}
       , suffix = options.suffix || ''
       , extension = options.extension || ''
-      , tmp = filename.split('/');
+      , tmp = filename.split('/')
+      ;
           
     //extract *real* filename from path
     tmp = tmp[tmp.length - 1];

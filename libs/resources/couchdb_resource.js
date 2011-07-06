@@ -257,7 +257,7 @@ CouchDBResource.prototype = {
 var factoryFunctions = {
     initialize: function initialize_CouchDBResource(model_name, callback) {
       var that = this
-        , doc_type = model_name.toLowerCase()
+        , doc_type = namespace.extractName(model_name.toLowerCase(), { suffix: '_document' })
         ;
         
       //Initialize connection object
