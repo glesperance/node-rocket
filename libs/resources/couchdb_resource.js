@@ -142,6 +142,9 @@ function setProperties(dst, src, synced) {
   }
   
   for(var prop in src) {
+  
+    if( dst.propertyIsEnumerable(k) === false) { continue; }
+    
     var val = src[prop];
     delete src[prop];
     Object.defineProperty(dst, prop, { enumerable: true,  configurable: true, get: createGetter(prop), set: createSetter(prop) });
@@ -340,7 +343,7 @@ var factoryFunctions = {
         
         //add the schema to the design doc
         docObj[ROCKET_NAMESPACE].schema = {};
-        docObj[ROCKET_NAMESPACE].schema[doc_type] = 'module.exports = ' + JSON.stringify(that.schema);
+        docObj[ROCKET_NAMESPACE].schema[doc_type] = 'module.exports = ' + JSON.stringify(that.prototype.schema);
         
         //convert all functions to strings
         fctToString(docObj);

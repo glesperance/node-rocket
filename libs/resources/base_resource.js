@@ -19,27 +19,37 @@ BaseResource.prototype = {
   , destroy: unimplemented('destroy_UnknownResourceInstance')
   , reload: unimplemented('reload_UnknownResourceInstance')
   , exists: unimplemented('exists_UnknownResourceInstance')
-  , setAlias: function setAlias(val_name, alias){
-      return this.setAliases(val_name, [alias]);
-    }
-  , setAliases: function setAliases_BaseResource(val_name, aliases) {
-      for(var i = 0, ii = aliases.length; i < ii; i++) {
-        var alias = aliases[i]
-          ;
-        
-        Object.defineProperty(
-          this
-        , alias
-        , { 
-            get: function() {
-              return this[val_name]
-            }
-          , set: function(new_val) {
-              this[val_name] = new_val;
-            } 
+  , setAlias: function setAlias_BaseResource(alias_name, options) {
+      var prefix = ''
+        , real_name = options
+        , getter = function() {
+            return this[real_name];
           }
-        );
+        , setter = function(new_val) {
+            this[real_name] = new_val;
+          }
+        ;
+      
+      if(typeof options === 'object') {
+        real_name = options.name;
+        if(options.noPrefix) {
+        
+          prefix = this.schema[real_name].prefix;
+          
+          getter = function() {
+            return this[real_name].substr(prefix.length);
+          };
+          setter = function(new_val) {
+            this[real_name] = prefix + new_val;
+          };
+        }
       }
+  
+      Object.defineProperty(
+        this
+      , alias_name
+      , { get: getter, set: setter }
+      );
     }
   };
 
@@ -105,16 +115,18 @@ oo.__extends(BaseResource, factoryFunctions);
  * Base Resource Constructor
  */
 function BaseResource(obj){
-  //setAliases
+  
   for(var k in this.schema){
     var v = this.schema[k];
     
-    if(typeof v === 'object'
-    && v
-    ){
-      if(typeof v.alias === 'string'
-      && v.alias
-      ){
+    if(typeof v === 'object' && v) {
+      //set aliases
+      if(
+      ( 
+        typeof v.alias === 'object'
+      ||typeof v.alias === 'string'
+      )
+      && v.alias) {
         this.setAlias(k, v.alias);
       }
     }
