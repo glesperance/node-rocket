@@ -123,7 +123,7 @@ CouchDBResource._security = {
 /******************************************************************************
  * Utils functions
  */
-function setProperties(dst, src, synced){
+function setProperties(dst, src, synced) {
   
   var synced = typeof synced !== 'undefined' ? synced : true;
   
@@ -168,7 +168,7 @@ function timestamp(obj) {
   obj.modification_date = current_time;
 }
 
-function set_doc_type(obj, doc_type){
+function set_doc_type(obj, doc_type) {
   if(typeof obj.doc_type === 'undefined'
   || obj.doc_type === null
   || obj.doc_type === ''
@@ -177,6 +177,32 @@ function set_doc_type(obj, doc_type){
   ){
     obj.doc_type = doc_type;
   }
+}
+
+function oo_cb_wrapper(cons, cb)Ê{
+  return function(err, res) {
+    
+    var objects = [];
+        
+    if(err)Ê{ cb(err); return; }
+    
+    if(res) {
+      if(Array.isArray(res)){
+        cons = (Array.isArray(cons) ? cons : [cons]);
+        
+        for(var i = 0, ii = res.length; i < ii; i++) {
+          objects.push(new cons[i % cons.length](res[i]));
+        }
+        cb(err, objects);
+      }else{
+        //single object...
+        cb(err, new cons(res));
+      }      
+    }else{
+      cb(err, res); return;
+    }
+    
+  };
 }
 
 /******************************************************************************
@@ -374,7 +400,7 @@ var factoryFunctions = {
       this.__db.save(obj._id, obj._rev, obj, callback);
     }
   , get: function get_CouchDBResource(_id, callback) {
-      this.__db.get(_id, callback);
+      this.__db.get(_id, oo_cb_wrapper(this.prototype.constructor, callback));
     }
   , update: function update_CouchDBResource(_id, properties, callback) {
       timestamp(properties);
@@ -384,11 +410,39 @@ var factoryFunctions = {
   , destroy: function destroy_CouchDBResource(_id, callback) {
       this.__db.remove(_id, callback);
     }
-  , all: function all_CouchDBResource(callback) {
-      this.__db.view('rocket/all', callback);
+  , all: function all_CouchDBResource(args) {
+      var args_array = Array.prototype.slice.call(args)
+        ;
+        
+      args_array.unshift('rocket/all');
+      
+      this.view(args_array);
     }
   , view: function view_CouchDBResource() {
-      this.__db.view.apply(this.__db, arguments);
+      var args_array    = Array.prototype.slice.call(arguments)
+        , view          = args_array.shift()
+        , params        = (  
+                             typeof args_array[0] === 'object' 
+                          && args_array[0] 
+                          && ! Array.isArray(args_array[0])
+                          ? args_array.shift() 
+                          : {}
+                          )
+        , constructors  = (  
+                             typeof args_array[0] === 'object' 
+                          && args_array[0] 
+                          && Array.isArray(args_array[0])
+                          ? args_array.shift() 
+                          : this.prototype.constructor
+                          )
+        , callback      = args_array.shift()
+        ;
+        
+      //add doc_type argument to filter out other docs
+      params.doc_type = this.prototype.doc_type;
+      
+      //call with our callback to objectify the result
+      this.__db.view.apply(this.__db, params, oo_cb_wrapper(this.prototype.constructor, callback));
     }
   };
 
