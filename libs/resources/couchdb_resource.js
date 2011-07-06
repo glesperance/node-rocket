@@ -143,7 +143,7 @@ function setProperties(dst, src, synced) {
   
   for(var prop in src) {
   
-    if( dst.propertyIsEnumerable(k) === false) { continue; }
+    if( dst.propertyIsEnumerable(prop) === false) { continue; }
     
     var val = src[prop];
     delete src[prop];
