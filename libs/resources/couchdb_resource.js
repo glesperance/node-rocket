@@ -53,11 +53,16 @@ CouchDBResource.ddocs = [
         }
       }
     , validate_doc_update: function(newDoc, oldDoc, userCtx) {
-        var schema = require('rocket/schema');
         
-        if(newDoc._deleted) {
+        if(newDoc._deleted
+        || typeof newDoc.doc_type === 'undefined'
+        || newDoc.doc_type === null
+        || newDoc.doc_type === ''
+        ){
           return;
         }
+        
+        var schema = require('rocket/schema/' + newDoc.doc_type);
                 
         for(var member in schema) {
         
@@ -150,11 +155,39 @@ function updateCache(obj, newValues) {
   obj.__db.cache.store[obj._id].document = newValues;
   obj.__db.cache.store[obj._id].attime = Date.now();
 }
+
+function timestamp(obj) {
+
+  var current_time = new Date().getTime();
+
+  if(typeof obj.creation_date === 'undefined'
+  || obj.creation_date === null
+  ){
+    obj.creation_date = current_time;
+  }
+  
+  obj.modification_date = current_time;
+}
+
+function set_doc_type(obj, doc_type){
+  if(typeof obj.doc_type === 'undefined'
+  || obj.doc_type === null
+  || obj.doc_type === ''
+  || !obj.propertyIsEnumerable('doc_type')
+  || obj.doc_type !== doc_type
+  ){
+    obj.doc_type = doc_type;
+  }
+}
  
 CouchDBResource.prototype = {
     save: function save_CouchDBResourceInstance(callback) {
       var that = this
       ;
+      
+      timestamp(this);
+      set_doc_type(this, this.doc_type);
+      
       this.__db.save(this._id, this._rev, this, function(err,res) {
         if(err){
           callback(err);
@@ -168,6 +201,10 @@ CouchDBResource.prototype = {
       var modz = {}
         , that = this
         ;
+        
+      timestamp(this);
+      set_doc_type(this, this.doc_type);
+        
       for(var k in this) {
         if(this.propertyIsEnumerable(k) === false) {
           continue;
@@ -217,7 +254,10 @@ CouchDBResource.prototype = {
  */
 var factoryFunctions = {
     initialize: function initialize_CouchDBResource(model_name, callback) {
-      var that = this;
+      var that = this
+        , doc_type = model_name.toLowerCase()
+        ;
+        
       //Initialize connection object
       that.__connection = new cradle.Connection(
           that.connection.host
@@ -229,12 +269,14 @@ var factoryFunctions = {
       if(typeof that.db_name !== 'undefined' && that.db_name !== null){ 
         that.__db_name = that.db_name;
       }else{
-        that.__db_name = lingo.en.pluralize(model_name).toLowerCase();
+        that.__db_name = lingo.en.pluralize(doc_type);
       }
       
       //setup db object
       that.__db = that.__connection.database(that.__db_name);
       that.prototype.__db  = that.__db;
+      
+      that.prototype.doc_type  = doc_type;
       
       //Create db if it doesn't exists. Harmless otherwise.
       that.__db.create();
@@ -268,11 +310,9 @@ var factoryFunctions = {
         //add the validators to the design doc
         docObj[ROCKET_NAMESPACE].validators = oo.__extends({}, that.validators);
         
-        //add the schema to the deisng doc
-        docObj[ROCKET_NAMESPACE].schema  = 'module.exports = ' + JSON.stringify(that.schema);
-        
-        //remove previous digest
-        delete docObj.digest;
+        //add the schema to the design doc
+        docObj[ROCKET_NAMESPACE].schema = {};
+        docObj[ROCKET_NAMESPACE].schema[doc_type] = 'module.exports = ' + JSON.stringify(that.schema);
         
         //convert all functions to strings
         fctToString(docObj);
@@ -285,31 +325,31 @@ var factoryFunctions = {
         //make all the oo functions available through commonJS' `require`
         docObj[ROCKET_NAMESPACE].oo = fs.readFileSync(path.join(__dirname, '../utils/oo.js'), 'utf8');
         
-        //docObj to a JSON string
-        var docJSON = JSON.stringify(docObj);
-        
-        //compute the MD5sum of the string
-        var md5sum = crypto.createHash('md5');
-        md5sum.update(docJSON);
-        
-        //store the result
-        docObj.digest = md5sum.digest('hex');
-        
         that.get(docObj._id, checkAndUpdate);
         
         function checkAndUpdate(err, doc) {
         
+          doc = doc || {};
+          
+          var oldDocJSON = JSON.stringify(doc);
+          
+          //extend the DB doc with the current doc
+          oo.__extends(doc, docObj, {overwrite: true});
+        
+          //docObj to a JSON string
+          var docJSON = JSON.stringify(doc);
+          
           if(err) {
             if(err.error === 'not_found'){
-              that.__db.save(docObj._id, docObj, callback);
+              that.__db.save(doc._id, doc, callback);
             }else{
-              console.log(('xxx [CouchDBResource] ERROR id: ' + docObj._id + ' ' + require('util').inspect(err)).red);
+              console.log(('xxx [CouchDBResource] ERROR id: ' + doc._id + ' ' + require('util').inspect(err)).red);
               callback(err);
             }
           }else{
-            if(doc.digest !== docObj.digest) {
-              oo.__extends(doc, docObj, {overwrite: true});
-              that.__db.save(docObj._id, doc._rev, doc, callback);
+          
+            if(oldDocJSON !== docJSON) {
+              that.__db.save(doc._id, doc._rev, doc, callback);
             }else{
               callback(null);
             }
@@ -320,15 +360,23 @@ var factoryFunctions = {
   , create: function create_CouchDBResource(properties, callback) {
       var _id = properties._id;
       delete properties._id;
+      
+      timestamp(properties);
+      set_doc_type(properties, this.prototype.doc_type);
+      
       this.__db.save(_id, properties, callback);
     }
   , save: function save_CouchDBResource(obj, callback) {
+      timestamp(obj);
+      set_doc_type(obj, this.prototype.doc_type);
       this.__db.save(obj._id, obj._rev, obj, callback);
     }
   , get: function get_CouchDBResource(_id, callback) {
       this.__db.get(_id, callback);
     }
   , update: function update_CouchDBResource(_id, properties, callback) {
+      timestamp(properties);
+      set_doc_type(properties, this.prototype.doc_type);
       this.__db.merge(_id, properties, callback);
     }
   , destroy: function destroy_CouchDBResource(_id, callback) {
