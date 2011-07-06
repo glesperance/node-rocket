@@ -121,9 +121,8 @@ CouchDBResource._security = {
   };
 
 /******************************************************************************
- * Resource Prototype Functions (used to create models)
+ * Utils functions
  */
-
 function setProperties(dst, src, synced){
   
   var synced = typeof synced !== 'undefined' ? synced : true;
@@ -158,7 +157,7 @@ function updateCache(obj, newValues) {
 
 function timestamp(obj) {
 
-  var current_time = new Date().getTime();
+  var current_time = new Date.now();
 
   if(typeof obj.creation_date === 'undefined'
   || obj.creation_date === null
@@ -179,7 +178,10 @@ function set_doc_type(obj, doc_type){
     obj.doc_type = doc_type;
   }
 }
- 
+
+/******************************************************************************
+ * Resource Prototype Functions (used to create models)
+ */
 CouchDBResource.prototype = {
     save: function save_CouchDBResourceInstance(callback) {
       var that = this
@@ -334,7 +336,7 @@ var factoryFunctions = {
           var oldDocJSON = JSON.stringify(doc);
           
           //extend the DB doc with the current doc
-          oo.__extends(doc, docObj, {overwrite: true});
+          oo.__deepExtends(doc, docObj, {overwrite: true});
         
           //docObj to a JSON string
           var docJSON = JSON.stringify(doc);
@@ -396,7 +398,8 @@ oo.__extends(CouchDBResource, factoryFunctions, {overwrite: true});
  * CouchDBResource's Constructor
  */
 function CouchDBResource(obj) {
-  setProperties(this, obj);
+  arguments.callee.__super__.call(this, obj);
+  setProperties(this, this);
 };
 
 oo.inherits(CouchDBResource, BaseResource);

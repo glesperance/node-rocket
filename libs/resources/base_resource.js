@@ -19,6 +19,28 @@ BaseResource.prototype = {
   , destroy: unimplemented('destroy_UnknownResourceInstance')
   , reload: unimplemented('reload_UnknownResourceInstance')
   , exists: unimplemented('exists_UnknownResourceInstance')
+  , setAlias: function setAlias(val_name, alias){
+      return this.setAliases(val_name, [alias]);
+    }
+  , setAliases: function setAliases_BaseResource(val_name, aliases) {
+      for(var i = 0, ii = aliases.length; i < ii; i++) {
+        var alias = aliases[i]
+          ;
+        
+        Object.defineProperty(
+          this
+        , alias
+        , { 
+            get: function() {
+              return this[val_name]
+            }
+          , set: function(new_val) {
+              this[val_name] = new_val;
+            } 
+          }
+        );
+      }
+    }
   };
 
 /******************************************************************************
@@ -82,7 +104,23 @@ oo.__extends(BaseResource, factoryFunctions);
 /******************************************************************************
  * Base Resource Constructor
  */
-function BaseResource(){ /* silence is golden */ }
+function BaseResource(obj){
+  //setAliases
+  for(var k in this.schema){
+    var v = this.schema[k];
+    
+    if(typeof v === 'object'
+    && v
+    ){
+      if(typeof v.alias === 'string'
+      && v.alias
+      ){
+        this.setAlias(k, v.alias);
+      }
+    }
+  }
+  oo.__extends(this, obj);
+}
 
 //Finally export the `BaseResource` class
 module.exports = BaseResource;
