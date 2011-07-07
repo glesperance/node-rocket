@@ -1,5 +1,5 @@
 
-exports.__extends = function __extends(child, parent, options) {
+function __extends(child, parent, options) {
   
   var options = options || {}
     , child_copy = undefined;
@@ -20,7 +20,7 @@ exports.__extends = function __extends(child, parent, options) {
   }
   return child_copy || child;
 };
-
+exports.__extends = __extends;
 /*****************************************************************************/
 
 
@@ -98,10 +98,8 @@ function inherits(child, parent) {
   __deepExtends(child, parent);
   
   //constructor helper
-  function ctor() { 
-    //set the constructor of the current context back to the child's
-    this.constructor = child.constructor;
-  }
+  function ctor() {}
+  
   //set ctor prototype to the parent's
   ctor.prototype = parent.prototype;
   
@@ -112,6 +110,9 @@ function inherits(child, parent) {
   //                                 = ctor.prototype 
   //                                 = parent.prototype
   child.prototype = __deepExtends(new ctor, child.prototype, {overwrite: true});
+  
+  //set the constructor of the current context back to the child's
+  child.prototype.constructor = child;
   
   //save the parent's prototype for direct future reference
   child.__super__ = parent;

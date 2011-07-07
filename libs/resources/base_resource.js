@@ -34,10 +34,11 @@ BaseResource.prototype = {
         real_name = options.name;
         if(options.noPrefix) {
         
-          prefix = this.schema[real_name].prefix;
+          prefix = this.constructor.schema[real_name].prefix;
           
           getter = function() {
-            return this[real_name].substr(prefix.length);
+            var value = this[real_name];
+            return (typeof value === 'string' ? value.substr(prefix.length) : value);
           };
           setter = function(new_val) {
             this[real_name] = prefix + new_val;
@@ -117,7 +118,7 @@ oo.__extends(BaseResource, factoryFunctions);
 function BaseResource(obj){
   
   for(var k in this.constructor.schema){
-    var v = this.schema[k];
+    var v = this.constructor.schema[k];
     
     if(typeof v === 'object' && v) {
       //set aliases

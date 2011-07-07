@@ -46,10 +46,17 @@ CouchDBResource.ddocs = [
     , updates: {
         in_place: function(doc, req) {
           var oo  = require('rocket/oo')
+            , ret
             ;
-          oo.__extends(doc, req.query, { overwrite: true });
           
-          return [doc, JSON.stringify(doc)];
+          if(doc !== null) {
+            oo.__extends(doc, req.query, { overwrite: true });
+            ret = doc;
+          }else{
+            ret = req.query;
+          }
+          
+          return [ret, JSON.stringify(ret)];
         }
       }
     , validate_doc_update: function(newDoc, oldDoc, userCtx) {
@@ -91,12 +98,12 @@ CouchDBResource.ddocs = [
             if(typeof value !== 'undefined'
             && value !== null) {
               if(alias) {
-                throw({ invalid: member + ' is an alias. Aliases must not be saved in DB.' });
+                continue;
               }
             
               if(prefix) {
                 if(value.substr(0, prefix.length) !== prefix) {
-                  throw({ invalid: member + ' must have prefix [' + prefix + ']' });
+                  throw({ invalid: member + '[' + value + '] must have prefix [' + prefix + ']' + '\n' + JSON.stringify(newDoc) });
                 }else{
                   value = value.substr(prefix.length);
                 }
@@ -177,7 +184,7 @@ function updateCache(obj, newValues) {
 
 function timestamp(obj) {
 
-  var current_time = new Date.now();
+  var current_time = Date.now();
 
   if(typeof obj.creation_date === 'undefined'
   || obj.creation_date === null
@@ -249,7 +256,7 @@ CouchDBResource.prototype = {
       var modz = {}
         , that = this
         ;
-        
+      console.log('update');
       timestamp(this);
       set_doc_type(this, this.doc_type);
         
@@ -405,27 +412,22 @@ var factoryFunctions = {
         };
       };
     }
-  , create: function create_CouchDBResource(properties, callback) {
-      var _id = properties._id;
-      delete properties._id;
-      
-      timestamp(properties);
-      set_doc_type(properties, this.prototype.doc_type);
-      
-      this.__db.save(_id, properties, callback);
+  , create: function create_CouchDBResource(obj, callback) {
+      var constructor = this.prototype.constructor
+        , obj = (obj instanceof constructor ? obj : new constructor(obj))
+        ;
+        
+      obj.save(callback);  
     }
   , save: function save_CouchDBResource(obj, callback) {
-      timestamp(obj);
-      set_doc_type(obj, this.prototype.doc_type);
-      this.__db.save(obj._id, obj._rev, obj, callback);
+      var constructor = this.prototype.constructor
+        , obj = (obj instanceof constructor ? obj : new constructor(obj))
+        ;
+        
+      obj.save(callback);  
     }
   , get: function get_CouchDBResource(_id, callback) {
       this.__db.get(_id, oo_cb_wrapper(this.prototype.constructor, callback));
-    }
-  , update: function update_CouchDBResource(_id, properties, callback) {
-      timestamp(properties);
-      set_doc_type(properties, this.prototype.doc_type);
-      this.__db.merge(_id, properties, callback);
     }
   , destroy: function destroy_CouchDBResource(_id, callback) {
       this.__db.remove(_id, callback);
