@@ -517,14 +517,14 @@ var rocket = {
       //extend the jade engine with our filters
       var jade = require('jade');
       
+      //build _rocket_index for browserify
+      build_libs_index(app.rocket.app_dir);
+      
       app.browserify = require('browserify')({
         mount : '/browserify.js'
       , require: path.join(app.rocket.app_dir, CLIENT_LIBS_DIR, CLIENT_LIBS_INDEX_FILENAME)
       , watch: true
       });
-
-      //build _rocket_index for browserify
-      build_libs_index(app.rocket.app_dir);
       
       //default configuration
       app.configure(function() {
