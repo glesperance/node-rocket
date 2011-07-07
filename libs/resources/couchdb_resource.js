@@ -167,7 +167,7 @@ function setProperties(dst, src, synced) {
   
   for(var prop in src) {
   
-    if( dst.propertyIsEnumerable(prop) === false) { continue; }
+    if( src.propertyIsEnumerable(prop) === false) { continue; }
     
     var val = src[prop];
     delete src[prop];
@@ -178,8 +178,10 @@ function setProperties(dst, src, synced) {
 }
 
 function updateCache(obj, newValues) {
-  obj.__db.cache.store[obj._id].document = newValues;
-  obj.__db.cache.store[obj._id].attime = Date.now();
+  if(obj.__db.cache.store[obj._id]) {
+    obj.__db.cache.store[obj._id].document = newValues;
+    obj.__db.cache.store[obj._id].attime = Date.now();
+  }
 }
 
 function timestamp(obj) {
@@ -256,7 +258,7 @@ CouchDBResource.prototype = {
       var modz = {}
         , that = this
         ;
-      console.log('update');
+        
       timestamp(this);
       set_doc_type(this, this.doc_type);
         
@@ -294,7 +296,6 @@ CouchDBResource.prototype = {
         if(err) {
           callback(err);
         }else{
-        
           setProperties(that, doc);
           callback(null, that);
         }        
