@@ -329,17 +329,16 @@ var factoryFunctions = {
       //Create db if it doesn't exists. Harmless otherwise.
       that.__db.create();
       
-      var current_doc;
+      //prepare ddoc if it exists
+      if(that.ddoc) {
+        that.ddoc._id = that.ddoc._id || '_design/' + doc_type;
+        that.ddocs.push(that.ddoc); 
+      }
       
-      async.whilst(
-        function() { return current_doc = that.ddocs.shift() }
-      , function(callback){ syncDoc(current_doc, callback); }
-      , function(err) {
-          if(err){ callback(err); return; }
-          that.__db._save('_security', false, that._security, callback);
-          callback(null);
-        }
-      );
+      async.parallel([
+        function(callback) { async.forEach(that.ddocs, syncDoc, callback); }
+      , function(callback) { that.__db._save('_security', false, that._security, callback); }
+      ], callback); 
             
       function fctToString(obj) {
        for(var key in obj) {

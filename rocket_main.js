@@ -316,12 +316,11 @@ function setupControllers(app) {
  */  
 function setupModels(app) {
   var models_files = fs.readdirSync(path.join(app.rocket.app_dir, MODELS_DIR_NAME))
-    , current_file
     ;
   
-  async.whilst(
-    function() { return current_file = models_files.shift(); }
-  , function(callback){
+  async.forEachSeries(
+    models_files
+  , function(current_file, callback){
       if(current_file === DATASOURCES_DIR_NAME || current_file === 'empty') {
         callback(null); return;
       }
@@ -336,6 +335,7 @@ function setupModels(app) {
     }
   , function(err) { if(err){ console.log(err); throw err; } }
   );
+
 }
 
 /******************************************************************************
