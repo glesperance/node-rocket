@@ -82,7 +82,13 @@ BaseResource.validators = {
         throw({ invalid: name + ': Value required to be either \'true\' or \'false\' got ' + obj});
       }
     }
-  , Date: function(obj) {
+  , Date: function(name, obj) {
+    }
+  , URL: function(name, obj) {
+      var r = new RegExp('^(http|https)://', 'i');
+      if(! r.test(obj)) {
+        throw({ invalid: name + ': The URL you entered is invalid got ' + obj });
+      }
     }
   };
 
