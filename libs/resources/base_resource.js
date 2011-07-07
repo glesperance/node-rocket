@@ -49,7 +49,7 @@ BaseResource.prototype = {
       Object.defineProperty(
         this
       , alias_name
-      , { get: getter, set: setter }
+      , { get: getter, set: setter, enumerable: true }
       );
     }
   };

@@ -167,7 +167,12 @@ function setProperties(dst, src, synced) {
   
   for(var prop in src) {
   
-    if( src.propertyIsEnumerable(prop) === false) { continue; }
+    if(src.propertyIsEnumerable(prop) === false
+    || dst.__lookupGetter__(prop)
+    || dst.__lookupSetter__(prop)
+    ){ 
+      continue;
+    }
     
     var val = src[prop];
     delete src[prop];
@@ -208,30 +213,20 @@ function set_doc_type(obj, doc_type) {
   }
 }
 
-function oo_cb_wrapper(cons, cb) {
-  return function(err, res) {
+function objectify(obj, cons, cb) { 
+  var objects = [];
+   
+  if(Array.isArray(obj)){
+    cons = (Array.isArray(cons) ? cons : [cons]);
     
-    var objects = [];
-        
-    if(err) { cb(err); return; }
-    
-    if(res) {
-      if(Array.isArray(res)){
-        cons = (Array.isArray(cons) ? cons : [cons]);
-        
-        for(var i = 0, ii = res.length; i < ii; i++) {
-          objects.push(new cons[i % cons.length](res[i]));
-        }
-        cb(err, objects);
-      }else{
-        //single object...
-        cb(err, new cons(res));
-      }      
-    }else{
-      cb(err, res); return;
+    for(var i = 0, ii = obj.length; i < ii; i++) {
+      objects.push(new (cons[i % cons.length])(obj[i]));
     }
-    
-  };
+    cb(null, objects);
+  }else{
+    //single object...
+    cb(null, new cons(obj));
+  }
 }
 
 /******************************************************************************
@@ -428,7 +423,7 @@ var factoryFunctions = {
       obj.save(callback);  
     }
   , get: function get_CouchDBResource(_id, callback) {
-      this.__db.get(_id, oo_cb_wrapper(this.prototype.constructor, callback));
+      this.__db.get(_id, function(err, doc){ objectify(doc, this.prototype.constructor, callback); });
     }
   , destroy: function destroy_CouchDBResource(_id, callback) {
       this.__db.remove(_id, callback);
@@ -464,8 +459,16 @@ var factoryFunctions = {
       //add doc_type argument to filter out other docs
       params.doc_type = this.prototype.doc_type;
       
+      if(view.indexOf('/') === -1){ view = params.doc_type + '/' + view; }
+      
       //call with our callback to objectify the result
-      this.__db.view.apply(this.__db, view, params, oo_cb_wrapper(constructors, callback));
+      this.__db.view(view, params, function(err, res){
+        if(err){ callback(err); return; }
+        objectify(res.rows, constructors, function(err, objects){
+          res.rows = objects;
+          callback(err, res);
+        }); 
+      });
     }
   };
 
