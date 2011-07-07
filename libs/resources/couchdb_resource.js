@@ -199,12 +199,12 @@ function set_doc_type(obj, doc_type) {
   }
 }
 
-function oo_cb_wrapper(cons, cb)Ê{
+function oo_cb_wrapper(cons, cb) {
   return function(err, res) {
     
     var objects = [];
         
-    if(err)Ê{ cb(err); return; }
+    if(err) { cb(err); return; }
     
     if(res) {
       if(Array.isArray(res)){
@@ -329,17 +329,18 @@ var factoryFunctions = {
       //Create db if it doesn't exists. Harmless otherwise.
       that.__db.create();
       
-      async.parallel(
-          [function(callback) {
-              async.forEach(that.ddocs, syncDoc, callback);
-            }
-          , function(callback) {
-              that.__db._save('_security', false, that._security, callback);
-            }
-          ]
-        , callback);
-        
+      var current_doc;
       
+      async.whilst(
+        function() { return current_doc = that.ddocs.shift() }
+      , function(callback){ syncDoc(current_doc, callback); }
+      , function(err) {
+          if(err){ callback(err); return; }
+          that.__db._save('_security', false, that._security, callback);
+          callback(null);
+        }
+      );
+            
       function fctToString(obj) {
        for(var key in obj) {
           if(typeof obj[key] === 'function') {
@@ -360,7 +361,7 @@ var factoryFunctions = {
         
         //add the schema to the design doc
         docObj[ROCKET_NAMESPACE].schema = {};
-        docObj[ROCKET_NAMESPACE].schema[doc_type] = 'module.exports = ' + JSON.stringify(that.prototype.schema);
+        docObj[ROCKET_NAMESPACE].schema[doc_type] = 'module.exports = ' + JSON.stringify(that.schema);
         
         //convert all functions to strings
         fctToString(docObj);
@@ -373,7 +374,7 @@ var factoryFunctions = {
         //make all the oo functions available through commonJS' `require`
         docObj[ROCKET_NAMESPACE].oo = fs.readFileSync(path.join(__dirname, '../utils/oo.js'), 'utf8');
         
-        that.get(docObj._id, checkAndUpdate);
+        that.__db.get(docObj._id, checkAndUpdate);
         
         function checkAndUpdate(err, doc) {
         
@@ -383,7 +384,7 @@ var factoryFunctions = {
           
           //extend the DB doc with the current doc
           oo.__deepExtends(doc, docObj, {overwrite: true});
-        
+          
           //docObj to a JSON string
           var docJSON = JSON.stringify(doc);
           
@@ -462,7 +463,7 @@ var factoryFunctions = {
       params.doc_type = this.prototype.doc_type;
       
       //call with our callback to objectify the result
-      this.__db.view.apply(this.__db, params, oo_cb_wrapper(this.prototype.constructor, callback));
+      this.__db.view.apply(this.__db, view, params, oo_cb_wrapper(constructors, callback));
     }
   };
 

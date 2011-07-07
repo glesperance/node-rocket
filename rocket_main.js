@@ -6,6 +6,7 @@ var fs        = require("fs")
   , colors    = require('colors')
   , path      = require('path')
   , lingo     = require('lingo')
+  , async     = require('async')
   ;
   
 var extractName = require('./libs/utils/namespace').extractName
@@ -314,22 +315,27 @@ function setupControllers(app) {
  * Models Setup
  */  
 function setupModels(app) {
-  var models_files = fs.readdirSync(path.join(app.rocket.app_dir, MODELS_DIR_NAME));
+  var models_files = fs.readdirSync(path.join(app.rocket.app_dir, MODELS_DIR_NAME))
+    , current_file
+    ;
   
-  for(var i = 0; i < models_files.length; i++) {
-    if(models_files[i] === DATASOURCES_DIR_NAME || models_files[i] === 'empty') {
-      continue;
-    }
-    var model_filename = models_files[i]
-      , model_name = extractName(model_filename, {extension: true})
-      , myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, model_filename))
-      ;
-    if(!lingo.en.isSingular(model_name)) {
-      throw ('xxx ERROR model filename must be singular [' + model_name + ']').red
-    }
+  async.whilst(
+    function() { return current_file = models_files.shift(); }
+  , function(callback){
+      if(current_file === DATASOURCES_DIR_NAME || current_file === 'empty') {
+        callback(null); return;
+      }
+      var model_name = extractName(current_file, {extension: true})
+        , myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, current_file))
+        ;
+      if(!lingo.en.isSingular(model_name)) {
+        callback('xxx ERROR model filename must be singular [' + model_name + ']').red
+      }
     
-    myModel.initialize.call(myModel, model_name);
-  }
+      myModel.initialize.call(myModel, model_name, callback);
+    }
+  , function(err) { if(err){ console.log(err); throw err; } }
+  );
 }
 
 /******************************************************************************
@@ -353,7 +359,7 @@ function compileExports(app) {
             console.log('!!! WARNING No `plugins` dir found in project. Skipping plugin exports...'.yellow);
             missing.push(PLUGINS_DIR_NAME);
       }else{
-        throw(err);
+        throw err;
       }
     }
   }
@@ -383,7 +389,7 @@ function compileExports(app) {
         console.log('!!! WARNING No `exports` dir found in project. Skipping exports...'.yellow);
         missing.push(EXPORT_DIR_NAME);
       }else{
-        throw(err);
+        throw err;
       }
     }
   }
