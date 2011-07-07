@@ -116,7 +116,7 @@ oo.__extends(BaseResource, factoryFunctions);
  */
 function BaseResource(obj){
   
-  for(var k in this.schema){
+  for(var k in this.constructor.schema){
     var v = this.schema[k];
     
     if(typeof v === 'object' && v) {
