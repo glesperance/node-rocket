@@ -47,7 +47,7 @@ function __deepExtends(child, parent, options) {
       if(typeof parent[prop] === 'object' 
       && parent[prop] !== null 
       && !Array.isArray(parent[prop])
-      && typeof parent[prop] === dst[prop]
+      && typeof parent[prop] === typeof dst[prop]
       )
       {        
         dst[prop] = dst[prop] || new parent[prop].constructor();
