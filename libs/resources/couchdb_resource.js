@@ -213,16 +213,18 @@ function set_doc_type(obj, doc_type) {
   }
 }
 
-function objectify(obj, cons, cb) { 
-  var objects = [];
+function objectify(obj, options, cons, cb) { 
+  var objects = []
+    ;
    
   if(Array.isArray(obj)){
     cons = (Array.isArray(cons) ? cons : [cons]);
     
     for(var i = 0, ii = obj.length; i < ii; i++) {
-      objects.push(new (cons[i % cons.length])(obj[i]));
+      var target = (options.view ? (options.include_doc ? obj[i].doc : obj[i].value): obj[i]);
+      target = new (cons[i % cons.length])(target);
     }
-    cb(null, objects);
+    cb(null, obj);
   }else{
     //single object...
     cb(null, new cons(obj));
@@ -423,7 +425,7 @@ var factoryFunctions = {
       obj.save(callback);  
     }
   , get: function get_CouchDBResource(_id, callback) {
-      this.__db.get(_id, function(err, doc){ objectify(doc, this.prototype.constructor, callback); });
+      this.__db.get(_id, function(err, doc){ objectify(doc, { view: false }, this.prototype.constructor, callback); });
     }
   , destroy: function destroy_CouchDBResource(_id, callback) {
       this.__db.remove(_id, callback);
@@ -461,8 +463,9 @@ var factoryFunctions = {
       
       //call with our callback to objectify the result
       this.__db.view(view, params, function(err, res){
+        console.log(res);
         if(err){ callback(err); return; }
-        objectify(res.rows, constructors, function(err, objects){
+        objectify(res.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
           res.rows = objects;
           callback(err, res);
         }); 
