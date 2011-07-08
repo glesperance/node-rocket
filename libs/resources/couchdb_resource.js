@@ -429,16 +429,17 @@ var factoryFunctions = {
       this.__db.remove(_id, callback);
     }
   , all: function all_CouchDBResource(args) {
-      var args_array = Array.prototype.slice.call(args)
+      var args_array = Array.prototype.slice.call(arguments)
         ;
         
       args_array.unshift('rocket/all');
       
-      this.view(args_array);
+      this.view.apply(this, args_array);
     }
   , view: function view_CouchDBResource() {
       var args_array    = Array.prototype.slice.call(arguments)
         , view          = args_array.shift()
+        , callback      = args_array.pop()
         , params        = (  
                              typeof args_array[0] === 'object' 
                           && args_array[0] 
@@ -453,7 +454,6 @@ var factoryFunctions = {
                           ? args_array.shift() 
                           : this.prototype.constructor
                           )
-        , callback      = args_array.shift()
         ;
         
       //add doc_type argument to filter out other docs
