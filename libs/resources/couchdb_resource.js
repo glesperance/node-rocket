@@ -456,10 +456,8 @@ var factoryFunctions = {
                           )
         ;
         
-      //add doc_type argument to filter out other docs
-      params.doc_type = this.prototype.doc_type;
       
-      if(view.indexOf('/') === -1){ view = params.doc_type + '/' + view; }
+      if(view.indexOf('/') === -1){ view = this.prototype.doc_type + '/' + view; }
       
       //call with our callback to objectify the result
       this.__db.view(view, params, function(err, res){
