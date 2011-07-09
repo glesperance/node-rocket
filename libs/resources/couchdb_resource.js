@@ -221,8 +221,18 @@ function objectify(obj, options, cons, cb) {
     cons = (Array.isArray(cons) ? cons : [cons]);
     
     for(var i = 0, ii = obj.length; i < ii; i++) {
-      var target = (options.view ? (options.include_doc ? obj[i].doc : obj[i].value): obj[i]);
-      target = new (cons[i % cons.length])(target);
+      var constructor =  cons[i % cons.length]
+        ;
+        
+      if(options.view) {
+        if(options.include_doc) {
+          obj[i].doc = new constructor(obj[i].doc);
+        }else{
+          obj[i].value = new constructor(obj[i].value);
+        }
+      }else{
+        obj[i] = new constructor(obj[i])
+      }
     }
     cb(null, obj);
   }else{
@@ -463,7 +473,7 @@ var factoryFunctions = {
       
       //call with our callback to objectify the result
       this.__db.view(view, params, function(err, res){
-        console.log(res);
+      
         if(err){ callback(err); return; }
         objectify(res.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
           res.rows = objects;
