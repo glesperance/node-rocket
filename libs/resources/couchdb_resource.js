@@ -435,7 +435,8 @@ var factoryFunctions = {
       obj.save(callback);  
     }
   , get: function get_CouchDBResource(_id, callback) {
-      this.__db.get(_id, function(err, doc){ objectify(doc, { view: false }, this.prototype.constructor, callback); });
+      var that = this;
+      this.__db.get(_id, function(err, doc){ objectify(doc, { view: false }, that.prototype.constructor, callback); });
     }
   , destroy: function destroy_CouchDBResource(_id, callback) {
       this.__db.remove(_id, callback);
