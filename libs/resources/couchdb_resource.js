@@ -474,8 +474,7 @@ var factoryFunctions = {
       
       //call with our callback to objectify the result
       this.__db.view(view, params, function(err, res){
-      
-        if(err){ callback(err); return; }
+        if(err){ console.log(err); callback(err); return; }
         objectify(res.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
           res.rows = objects;
           callback(err, res);
