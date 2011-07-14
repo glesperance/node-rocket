@@ -449,6 +449,71 @@ var factoryFunctions = {
       
       this.view.apply(this, args_array);
     }
+  , myView: function myView_CouchDBResource() {
+      var args_array    = Array.prototype.slice.call(arguments)
+      , view          = args_array.shift()
+      , callback      = args_array.pop()
+      , params        = (  
+                           typeof args_array[0] === 'object' 
+                        && args_array[0] 
+                        && ! Array.isArray(args_array[0])
+                        ? args_array.shift() 
+                        : {}
+                        )
+      , params_array;
+      
+      for(var k in params) {
+    	  v = params[k];
+    	  
+    	  params_array.push([
+    	                      k
+    	                    , '='
+    	                    , JSON.stringify(v)
+    	                    ].join('')
+    	  );
+      }
+      
+      var constructors  = (  
+                           typeof args_array[0] === 'object' 
+                        && args_array[0] 
+                        && Array.isArray(args_array[0])
+                        ? args_array.shift() 
+                        : this.prototype.constructor
+                        )
+      , splitted_param = view.split('/')
+      , get_options   = {
+    	    host: this.connection.host
+    	  , port: this.connection.port
+    	  , path: [
+    	           	'/' 
+	           	  , path.join(
+    			        this.db_name
+    			      , '_design'
+    			      , (splitted_param.length === 1  ? this.prototype.doc_type : splitted_param[0])
+    			      , '_view'
+    			      , (splitted_param.length === 1  ? splitted_param[0] : splitted_param[1])
+    	  		    )
+    	  		  , '?'
+    	  		  , params_array.join('&')
+    	  		  ].join('')
+        } 
+      ;
+      
+    console.log(get_options);
+    if(view.indexOf('/') === -1){ view = this.prototype.doc_type + '/' + view; }
+    
+    //call with our callback to objectify the result
+    /*this.__db.view(view, params, function(err, res){
+      if(err){ console.log(err); callback(err); return; }
+      objectify(res.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
+        res.rows = objects;
+        callback(err, res);
+      }); 
+    });*/
+    
+    
+    http.get(this.__connection, callback);
+  }
   , view: function view_CouchDBResource() {
       var args_array    = Array.prototype.slice.call(arguments)
         , view          = args_array.shift()
