@@ -532,6 +532,8 @@ var rocket = {
       , watch: true
       });
       
+      fs.unlink(path.join(app.rocket.app_dir, CLIENT_LIBS_DIR, CLIENT_LIBS_INDEX_FILENAME), function(err){ if(err){ console.log(err); }});
+      
       //default configuration
       app.configure(function() {
         app.set("view engine", 'jade');

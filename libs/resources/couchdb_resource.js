@@ -9,6 +9,7 @@ var crypto = require('crypto')
   , lingo = require('lingo')
   , cradle = require('cradle')
   , async = require('async')
+  , http = require('http')
   ;
  
 var oo = require('../utils/oo')
@@ -449,6 +450,90 @@ var factoryFunctions = {
       
       this.view.apply(this, args_array);
     }
+  , myView: function myView_CouchDBResource() {
+      var args_array    = Array.prototype.slice.call(arguments)
+      , view          = args_array.shift()
+      , callback      = args_array.pop()
+      , params        = (  
+                           typeof args_array[0] === 'object' 
+                        && args_array[0] 
+                        && ! Array.isArray(args_array[0])
+                        ? args_array.shift() 
+                        : {}
+                        )
+      , params_array = [];
+      
+      for(var k in params) {
+    	  v = params[k];
+    	  
+    	  params_array.push([
+    	                      k
+    	                    , '='
+    	                    , JSON.stringify(v)
+    	                    ].join('')
+    	  );
+      }
+      
+      var constructors  = (  
+                           typeof args_array[0] === 'object' 
+                        && args_array[0] 
+                        && Array.isArray(args_array[0])
+                        ? args_array.shift() 
+                        : this.prototype.constructor
+                        )
+      , splitted_param = view.split('/')
+      , auth = 'Basic ' + new Buffer(this.connection.options.auth.username + ':' + this.connection.options.auth.password).toString('base64')
+      , get_options   = {
+          headers: { 'Authorization': auth }
+    	  , host: this.connection.host
+    	  , options: this.connection.options
+    	  , port: this.connection.port
+    	  , path: [
+    	           	'/' 
+	           	  , path.join(
+    			        this.db_name
+    			      , '_design'
+    			      , (splitted_param.length === 1  ? this.prototype.doc_type : splitted_param[0])
+    			      , '_view'
+    			      , (splitted_param.length === 1  ? splitted_param[0] : splitted_param[1])
+    	  		    )
+    	  		  , '?'
+    	  		  , params_array.join('&')
+    	  		  ].join('')
+        } 
+      ;
+    
+    //call with our callback to objectify the result
+    /*this.__db.view(view, params, function(err, res){
+      if(err){ console.log(err); callback(err); return; }
+      objectify(res.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
+        res.rows = objects;
+        callback(err, res);
+      }); 
+    });*/
+    
+    var buffer = '';
+    http.get(get_options, function(res) {
+      res.on('data', function(chunk) {
+        buffer += chunk;
+      })
+      
+      res.on('end', function() {
+        var obj = JSON.parse(buffer);
+        
+        objectify(obj.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
+          obj.rows = objects;
+          callback(err, obj);
+        });
+      });
+      
+      res.on('error', function(err) {
+        console.log('ERROR: ' + err);
+      })
+    }).on('error', function(err) {
+      console.log('CON ERROR: ' + err)
+    });
+  }
   , view: function view_CouchDBResource() {
       var args_array    = Array.prototype.slice.call(arguments)
         , view          = args_array.shift()
@@ -474,8 +559,8 @@ var factoryFunctions = {
       
       //call with our callback to objectify the result
       this.__db.view(view, params, function(err, res){
-        
-        if(err){ callback(err); return; }
+
+        if(err){ console.log(err); callback(err); return; }
         objectify(res.rows, {view: true, include_docs: params.include_docs}, constructors, function(err, objects){
           res.rows = objects;
           callback(err, res);
