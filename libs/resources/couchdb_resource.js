@@ -507,7 +507,7 @@ var factoryFunctions = {
                   if (chunk.trim()) {
                       buffer.push(chunk);
 
-                      if (chunk.indexOf('\n') !== -1) {
+                      if (chunk.indexOf('\\n') !== -1) {
                     	  console.log(buffer);
                           buffer.length && response.emit('data', JSON.parse(buffer.join('')));
                           buffer = [];
