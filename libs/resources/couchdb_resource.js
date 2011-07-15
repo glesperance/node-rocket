@@ -10,6 +10,7 @@ var crypto = require('crypto')
   , cradle = require('cradle')
   , async = require('async')
   , http = require('http')
+  , events = require('events')
   ;
  
 var oo = require('../utils/oo')
@@ -450,6 +451,77 @@ var factoryFunctions = {
       
       this.view.apply(this, args_array);
     }
+  
+  , changes: function (options, callback) {
+      var promise = new(events.EventEmitter)
+        , params = options
+        , params_array = []
+        ;
+  
+     for(var k in params) {
+       v = params[k];
+    
+       params_array.push(
+          [
+	        k
+	      , '='
+	      , v
+	      ].join('')
+       	);
+     }
+     var auth = 'Basic ' + new Buffer(this.connection.options.auth.username + ':' + this.connection.options.auth.password).toString('base64')
+       , get_options   = {
+           headers: { 'Authorization': auth }
+         , host: this.connection.host
+         , options: this.connection.options
+         , port: this.connection.port
+         , path: 
+        	 [
+	           '/' 
+	         , path.join(
+	            this.db_name
+	           , '_changes'
+	           )
+	         , '?'
+	         , params_array.join('&')
+	         ].join('')
+          } 
+        ;
+
+      if (callback) {
+          //this.query('GET', '_changes', options, callback);
+    	  http.get(get_options, callback);
+      } else {
+
+          //that.rawRequest('GET', [name, '_changes'].join('/'), options).on('response', function (res) {
+          var request = http.get(get_options, function(res) {
+            var response = new(events.EventEmitter), buffer = [];
+              res.setEncoding('utf8');
+
+              response.statusCode = res.statusCode;
+              response.headers    = res.headers;
+              
+              promise.emit('response', response);
+
+              res.on('data', function (chunk) {
+                  if (chunk.trim()) {
+                      buffer.push(chunk);
+
+                      if (chunk.indexOf('\n') !== -1) {
+                    	  console.log(buffer);
+                          buffer.length && response.emit('data', JSON.parse(buffer.join('')));
+                          buffer = [];
+                      }
+                  }
+              }).on('end', function () {
+                  response.emit('end');
+              });
+          });
+          
+          return {promise: promise, request: request};
+      }
+  }
+  
   , view: function myView_CouchDBResource() {
         var args_array    = Array.prototype.slice.call(arguments)
         , view          = args_array.shift()

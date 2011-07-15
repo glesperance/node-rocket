@@ -395,7 +395,18 @@ function compileExports(app) {
   }
   
   if(myExports !== {}) {
-    app.rocket.dnode = dnode(myExports);
+    app.rocket.dnode = dnode(function(remote, conn) {
+      for(var k in myExports){
+    	var v    = myExports[k]
+    	  ;
+
+    	if(typeof v === 'function') {
+          this[k] = new v(remote,conn);
+    	} else {
+          this[k] = v;
+    	}
+      }
+    });
   }
   
 }
