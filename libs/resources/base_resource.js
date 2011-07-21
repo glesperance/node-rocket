@@ -58,36 +58,43 @@ BaseResource.prototype = {
  * Validation functions
  */
 BaseResource.validators = {
-    AlphaNumeric: function(name, obj) {
-      var regexp = new RegExp('^[A-Z0-9]+$', 'i');
+    AlphaNumeric: function(obj) {
+      var regexp = new RegExp('^[A-Z0-9]+$', 'i')
+        ;
+      
       if(! regexp.test(obj)) {
-        throw({ invalid: name + ': Alpha-Numeric string expected got ' + obj});
+        return 'Alphanumeric string expected [' + obj + ']';
       }
+      
     }
-  , Integer: function(name, obj) {
-      var regexp = new RegExp('^(-)?[0-9]+$');
+  , Integer: function(obj) {
+      var regexp = new RegExp('^(-)?[0-9]+$')
+        ;
+      
       if(! regexp.test(obj.toString())) {
-        throw({ invalid: name + ': Integer expected got ' + obj});
+        return 'Integer expected [' + obj + ']';
       }
+      
     }
-  , Email: function(name, obj) {
-      var r = new RegExp('^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}', 'i');
+  , Email: function(obj) {
+      var r = new RegExp('^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}', 'i')
+        ;
       
       if(! r.test(obj)) {
-        throw({ invalid: name + ': The email address you entered is invalid got ' + obj });
+        return 'Invalid email address [' + obj + ']';
       }
     }
-  , Boolean: function(name, obj) {
+  , Boolean: function(obj) {
       if(obj !== 'true' || obj !== 'false') {
-        throw({ invalid: name + ': Value required to be either \'true\' or \'false\' got ' + obj});
+        return 'Boolean value expected [' + obj + ']';
       }
     }
-  , Date: function(name, obj) {
+  , Date: function(obj) {
     }
-  , URL: function(name, obj) {
+  , URL: function(obj) {
       var r = new RegExp('^(http|https)://', 'i');
       if(! r.test(obj)) {
-        throw({ invalid: name + ': The URL you entered is invalid got ' + obj });
+        return 'Invalid URL [' + obj + ']';
       }
     }
   };

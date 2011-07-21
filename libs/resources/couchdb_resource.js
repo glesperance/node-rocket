@@ -62,6 +62,16 @@ CouchDBResource.ddocs = [
         }
       }
     , validate_doc_update: function(newDoc, oldDoc, userCtx) {
+      
+        var validator
+          , alias
+          , optional
+          , prefix
+          , schema
+          , value
+          , err
+          , errors = {}
+          ;
         
         if(newDoc._deleted
         || typeof newDoc.doc_type === 'undefined'
@@ -71,16 +81,17 @@ CouchDBResource.ddocs = [
           return;
         }
         
-        var schema = require('rocket/schema/' + newDoc.doc_type);
+        schema = require('rocket/schema/' + newDoc.doc_type);
                 
         for(var member in schema) {
+          
+          alias     = undefined;
+          validator = undefined;
+          optional  = false;
+          prefix    = undefined;
         
           if(typeof schema[member] !== 'undefined' 
           && schema[member] !== null) {
-          
-            var validator;
-            var optional;
-            var prefix;
             
             if(typeof schema[member] === 'string') {
             
@@ -95,7 +106,7 @@ CouchDBResource.ddocs = [
               
             }
             
-            var value = newDoc[member];
+            value = newDoc[member];
             
             if(typeof value !== 'undefined'
             && value !== null) {
@@ -105,21 +116,26 @@ CouchDBResource.ddocs = [
             
               if(prefix) {
                 if(value.substr(0, prefix.length) !== prefix) {
-                  throw({ invalid: member + '[' + value + '] must have prefix [' + prefix + ']' + '\n' + JSON.stringify(newDoc) });
+                  throw({ 'internal-error': member + '[' + value + '] must have prefix [' + prefix + ']' + '\n' + JSON.stringify(newDoc) });
                 }else{
                   value = value.substr(prefix.length);
                 }
               }
               
               if(validator) {
-                validator(member, value);
+                err = validator(value);
+                if(err){
+                  errors[member] = err;
+                  throw({forbidden: errors});
+                }
               }else{
                 continue;
               }
             }else if(optional || alias){
               continue;
             }else{
-              throw({ invalid: member + ' can\'t be missing or null' });
+              errors[member] = 'can\'t be missing or null'
+              throw({forbidden: errors});
             }
           }
         }
