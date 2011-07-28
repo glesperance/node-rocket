@@ -1,13 +1,13 @@
 # Rocket (node-rocket)
-##The rapid development framework for  node.js-couchDB real-time/comet web applications
+##The rapid development framework for  node.js/couchDB/mongoDB real-time/comet web applications
 
 <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
 
 RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of comet/real-time web applications using node.js and couchDB.
 
-Highly inspired by Ruby on Rails and cakePHP, Rocket puts forward the convention over configuration principle in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as couchDB distributed nature. 
+Highly inspired by Ruby on Rails and cakePHP, Rocket puts forward the convention over configuration principle in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as couchDB/mongoDB distributed natures. 
 
-Central to RocketJS is the principle of having a single point of contact between the programmer and the underlying application and resources. Hence, RocketJS aims to blur and reduce as much as possible the separation between the client (browser), the server (node.js) and the database (couchDB) while maximizing the scaling potential (for instance by allowing code sharing between couchDB and the server, and between the server and the client) and improving the performance of the resulting web application.  
+Central to RocketJS is the principle of having a single point of contact between the programmer and the underlying application and resources. Hence, RocketJS aims to blur and reduce as much as possible the separation between the client (browser), the server (node.js) and the databases (couchDB/mongoDB) while maximizing the scaling potential (for instance by allowing code sharing between couchDB and the server, and between the server and the client) and improving the performance of the resulting web application.  
 
 Built on top of express -- node.js’ high performance web development framework -- RocketJS provides a robust structure on which to build your web applications without sacrificing any of your freedom.
 
