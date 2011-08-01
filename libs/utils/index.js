@@ -1,3 +1,4 @@
 module.exports = {
-  namespace: require('./namespace')
+    oo: require('./oo')
+  , namespace: require('./namespace')
 }
