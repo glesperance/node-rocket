@@ -3,15 +3,16 @@ var fs        = require("fs")
   , express   = require("express")
   , Resource  = require("express-resource")
   , dnode     = require("dnode")
+  , colors    = require('colors')
   , path      = require('path')
   , lingo     = require('lingo')
   , async     = require('async')
-  , oo        = require('oo')
   ;
   
-var namespace   = require('./libs/utils/namespace')
-  , extractName = namespace.extractName
-  , checkName   = namespace.checkName
+var extractName = require('./libs/utils/namespace').extractName
+  , checkName = require('./libs/utils/namespace').checkName
+  , oo = require('./libs/utils/oo')
+  , views_filters = require('./libs/views/filters')
   ;
 
 /******************************************************************************
@@ -122,7 +123,7 @@ function setupControllers(app) {
       ;
     
     if (typeof app.rocket.controllers[name] !== 'undefined') {
-      throw("Route already in use");
+      throw("Route already in use".red);
     }
 
     if (has_view) {
@@ -246,7 +247,7 @@ function setupControllers(app) {
       controllers = fs.readdirSync(path.join(dir, CONTROLLERS_DIR_NAME));
     }catch(err){
       if(err.code === 'ENOENT') {
-        console.log('!!! WARNING No `' + CONTROLLERS_DIR_NAME + '` dir found in [' + dir + ']. Skipping exports...');
+        console.log(('!!! WARNING No `' + CONTROLLERS_DIR_NAME + '` dir found in [' + dir + ']. Skipping exports...').yellow);
       }else{
         throw(err);
       }
@@ -256,7 +257,7 @@ function setupControllers(app) {
       views = fs.readdirSync(path.join(dir, VIEWS_DIR_NAME));
     }catch(err){
       if(err.code === 'ENOENT') {
-        console.log('!!! WARNING No `' + VIEWS_DIR_NAME + '` dir found in [' + dir + ']. Skipping exports...');
+        console.log(('!!! WARNING No `' + VIEWS_DIR_NAME + '` dir found in [' + dir + ']. Skipping exports...').yellow);
       }else{
         throw(err);
       }
@@ -320,21 +321,17 @@ function setupModels(app) {
   async.forEachSeries(
     models_files
   , function(current_file, callback){
-      
       if(current_file === DATASOURCES_DIR_NAME || current_file === 'empty') {
         callback(null); return;
       }
-      
       var model_name = extractName(current_file, {extension: true})
         , myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, current_file))
-        , doc_type = namespace.extractName(model_name.toLowerCase(), { suffix: '_document' })
         ;
-      
       if(!lingo.en.isSingular(model_name)) {
-        callback('xxx ERROR model doc_type must be singular [' + model_name + ']');
+        callback('xxx ERROR model filename must be singular [' + model_name + ']').red
       }
-      
-      myModel.initialize.call(myModel, doc_type, callback);
+    
+      myModel.initialize.call(myModel, model_name, callback);
     }
   , function(err) { if(err){ console.log(err); throw err; } }
   );
@@ -359,7 +356,7 @@ function compileExports(app) {
       }
     }catch(err){
       if(err.code == 'ENOENT') {
-            console.log('!!! WARNING No `plugins` dir found in project. Skipping plugin exports...');
+            console.log('!!! WARNING No `plugins` dir found in project. Skipping plugin exports...'.yellow);
             missing.push(PLUGINS_DIR_NAME);
       }else{
         throw err;
@@ -389,7 +386,7 @@ function compileExports(app) {
       }      
     }catch(err){
       if(err.code === 'ENOENT') {
-        console.log('!!! WARNING No `exports` dir found in project. Skipping exports...');
+        console.log('!!! WARNING No `exports` dir found in project. Skipping exports...'.yellow);
         missing.push(EXPORT_DIR_NAME);
       }else{
         throw err;
@@ -506,6 +503,7 @@ var package_info = JSON.parse(package_JSON);
 
 var rocket = {
     version: package_info.version
+  , resources: require('./libs/resources')
   , utils: require('./libs/utils')
   , createServer: function createServer_rocket() {
       var args = Array.prototype.slice.call(arguments)
