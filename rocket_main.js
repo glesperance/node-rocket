@@ -314,29 +314,47 @@ function setupControllers(app) {
  * Models Setup
  */  
 function setupModels(app) {
+  
   var models_files = fs.readdirSync(path.join(app.rocket.app_dir, MODELS_DIR_NAME))
     ;
   
   async.forEachSeries(
-    models_files
-  , function(current_file, callback){
+    
+      models_files
+  
+    , function(current_file, callback){
       
-      if(current_file === DATASOURCES_DIR_NAME || current_file === 'empty') {
+      if (current_file === DATASOURCES_DIR_NAME || current_file === 'empty') {
+        
         callback(null); return;
+      
       }
       
-      var model_name = extractName(current_file, {extension: true})
-        , myModel = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, current_file))
-        , doc_type = namespace.extractName(model_name.toLowerCase(), { suffix: '_document' })
+      var model_name = extractName(current_file.toLowerCase(), {extension: true, suffix: '_document'})
+        , model_defn = require(path.join(app.rocket.app_dir, MODELS_DIR_NAME, current_file))
         ;
       
-      if(!lingo.en.isSingular(model_name)) {
+      if (!lingo.en.isSingular(model_name)) {
+      
         callback('xxx ERROR model doc_type must be singular [' + model_name + ']');
+      
       }
       
-      myModel.initialize.call(myModel, doc_type, callback);
+      Models.model(model_name, model_defn, callback);
+    
     }
-  , function(err) { if(err){ console.log(err); throw err; } }
+    
+  , function(err) {
+      
+      if (err) {
+      
+        console.log(err); 
+        throw err; 
+    
+      } 
+    
+    }
+  
   );
 
 }
