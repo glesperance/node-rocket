@@ -29,7 +29,7 @@ describe('Controller Modules Loader', function() {
     
     var done
       , ret_err
-    ;
+      ;
     
     waitsFor(function(){
       return done;
