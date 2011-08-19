@@ -1,5 +1,4 @@
 var express           = require('express')
-  , __                = require('express-resource')
   , path              = require('path')
   , fs                = require('fs')
   ;

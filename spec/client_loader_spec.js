@@ -89,6 +89,29 @@ describe('Client Module Loader', function() {
     
   });
   
+  it('should properly set up a middleware to statically serve rocket\'s `rocket-js` directory ', function () {
+    
+    var options = {
+                      host: 'localhost'
+                    , port: 3000
+                    , path: '/rocket-js/vendors/jquery-1.6.2.min.js'
+                  }
+    
+      , done    = false
+      ;
+    
+    waitsFor(function() { return done; });
+    
+    http.get(options, function(res) {
+      
+      expect(res.statusCode).toEqual(200);
+      
+      done = true;
+    
+    }).on('error', function(err) { throw err; });
+    
+  });
+  
   it('should properly set up a middleware to statically serve the app\'s `client/static` directory ', function () {
     
     var options = {
