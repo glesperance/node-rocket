@@ -26,7 +26,7 @@
     , "rimraf"            : ">= 1.0.4"
   }
 , "devDependencies": {
-    "expresso"            : ">=0.8.1"
+    "jessie"              : ">= 0.3.7"
   }
 , "licenses" :
     [{
