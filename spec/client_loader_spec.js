@@ -348,4 +348,11 @@ describe('Client Module Loader', function() {
     
   });
   
+  it('should properly stop the servers', function() {
+    
+    app.close();
+    app2.close();
+  
+  });
+  
 });

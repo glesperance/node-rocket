@@ -254,7 +254,12 @@ describe('Dnode Exports Loader', function() {
       return done;
     }, 'dnode connection to be established', 5000);
     
+  });
+  
+  it('should properly stop the server', function() {
     
+    app.close();
+  
   });
   
 });
