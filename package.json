@@ -12,7 +12,7 @@
 , "main": "rocket_main"
 , "bin" : { "rocket" : "./bin/rocket.js" }
 , "engines": {
-    "node": ">= 0.4.4"
+    "node": ">= 0.4.10"
   }
 , "dependencies": {
       "express"           : ">= 2.3.12"    
