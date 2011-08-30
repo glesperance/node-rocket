@@ -1,7 +1,7 @@
 # Rocket (node-rocket)
 ##The rapid development framework for node.js web applications
 
-<img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
+<img src="https://github.com/glesperance/node-rocket/raw/master/lib/logo.png" width="200" alt="Node Rocket Rocks!" />
 
 RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of real-time web applications using node.js.
 
@@ -15,7 +15,7 @@ Built on top of express -- node.js’ high performance web development framework
 * Automatic routing of your controllers
 * Automatic mapping of your views to their corresponding controller
 * Easy web-socket / comet application support through dnode
-* Easy server / client code sharing allowing the client to  use CommonJS  `require()` command to import/use server JS libraries
+* Easy server / client code sharing allowing the client to  use RequireJS  `require()` command to import/use server JS libraries
 * High focus on RESTful controller conventions
 * Client-side support for jade template
 * Automagic optimization of client javascript modules and CSS files
@@ -123,36 +123,75 @@ e.g. To require a module located at ./clients/js/a.js from the browser:
 The modules can also be located further down the `./client/js` directory tree.
 Hence you can require the file located at `./client/js/nested/dirs/b.js` by 
 doing :
-
+    
+    //NB do **NOT** put the `.js` after the filename !!
     var myModuleFct = require(['./client/libs/nested/dirs/b'], function(b) { /* ... */ });
 
-Usual _CommonJS_ conventions apply to the modules.  
+Usual _RequireJS_ conventions apply to the modules.  
 
 #### Using jade templates in the browser
 
 In view of reducing the friction between the programmer and its environment
-to a minimum, rocket allows the use of jade templates on the client side, that
-is, in the browser.
+to a minimum, rocket allows the use of jade templates on the client side.
 
 To do so, simply put all you jade partials files in the `client/js/view`
 directory and let rocket compile, and bundle those for you to use in the browser.
 
-To use your template in the browser, simply require it and use it.
+To use your template, simply require it and use it !
 
 e.g. To use the template located at `client/js/views/dialog.jade` you do :
  
-    require(['jade-runtime', `views/dialog.jade`] function(__, dialog) {
+    require(['jade-runtime', 'views/dialog.jade'], function(__, dialog) {
     
       var html  = dialog({ title: 'Hello World !', message: 'This works!!' })
         ;
         
-      console.log(html);
+      /* now use your compiled template ! */
      
     );
 
 #### Requiring javascript files from a CDN via require.config.json
 
+In order to speedup page loads and to further comply to DRYness principles, 
+rocket allows you to use CDN modules as if they were local, making sure you can
+still benefit from all the requireJS optimizations.
+
+To do so you simply need to list those modules in your require.config.json file
+located at the root of your `client/js` directory.
+
+E.g. to use the google's CDN jquery, jquery-ui and cdnJS's version of underscore,
+you'd need the following definitions in your require.config.json file :
+
+    {
+        "paths" : {
+            "jquery"      : "https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min"
+          , "jqueryui"    : "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min"
+          , "underscore"  : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.1.7/underscore-min"
+        }
+    }
+
+Note that we omitted '.js' extension for the modules...
+
 #### Production mode & Optimizations
+
+To further optimize browser load times, you can start rocket in production mode
+by defining the following environment variable at start:
+
+     NODE_ENV='production'
+     
+When in production mode, rocket (1) bundles all your javascript client files at 
+the root of your `client/js` directory with their dependencies, and then uglifies
+them.
+
+Thus, when those are used on the browser, only one request is needed to fetch them.
+
+Rocket also (2) bundles your CSS files by resolving their @import statement.
+The resulting CSS files are also minified.
+
+Note that since your client jade template are compiled before being sent to the
+browser, they are optimized too !
+
+All those optimizations are provided by RequireJS r.js utility.
 
 ### Serving static files via ./client/static
 
@@ -284,37 +323,57 @@ Auto-loading functions take the following form:
 
 For more info see [express-resource readme](https://github.com/visionmedia/express-resource "Express Resource - GitHub").
 
-### Nesting controllers
-
-You can nest controllers by leveraging `app.rocket.controllers` and the *express-resource* `add` 
-function in your `./launcher.js` file :
-
-    /****************************************************************
-     * LAUNCHER.JS
-     */
-    var rocket = require('rocket')
-      , LISTEN_PORT = 80
-      , app = rocket.createServer(__dirname)
-      ;
-      
-    app.listen(LISTEN_PORT);
-    
-    //Nest the `children` controller under the `parents` controller.
-    app.rocket.controllers.parents.add(app.rocket.controllers.children);
-
 ## Dnode exports
 
-### Exporting remote functions/objects to the client via ./exports/
+By using substack's [dnode](https://github.com/substack/dnode) library, rocket 
+allows you to export server objects and make them acessible to the client.
 
-### Calling your exported functions from the client -- or browser.
+To export a module, simply create a javascript file in your `exports` directory
+and rocket will automagically, export it for you.
+
+e.g.
+
+The `exports/chat.js` file :
+
+    exports.sendMsg = function(msg) { /*...*/ } 
+    
+will be accessible through dnode in the client by doing :
+
+    require(['dnode'], function(dnode) {
+      
+      dnode.connect(function(remote) {
+        remote.chat.sendMsg('Hello world!');
+      });
+    
+    });
 
 ## Models
 
 Starting with version 0.1.x, rocket is database agnostic. If you're looking 
-forward to use a noSQL DB, we **highly** recommend you to use [mongoDB](http://www.mongodb.org/) in 
+forward to using a noSQL DB, we **highly** recommend you to use [mongoDB](http://www.mongodb.org/) in 
 conjunction with [mongoose](http://http://mongoosejs.com/).
 
+## Locales
+
+Essential to any production application is the need to have localization support.
+
+As with controllers and views, rocket puts forward conventions that will allow
+you to better manage your projects, making sure everything is at its right place.
+
+To do so, rocket leverage the jade-i18n library by taking each javascript 
+packages it finds in the `./locales` directory and then define the phrases it contains.
+
+For example, to define the phrase *WELCOME_MESSAGE* in *en_CA* you simply create
+a file named **en_CA.js** (in the **locales** directory) containing the following:
+
+    module.exports = {
+        WELCOME_MESSAGE : 'Hello world !'
+      , GOODBYE_MESSAGE : 'Bye world !'
+    }
+
 ## Views
+
+
 
 ### Controller/Views mapping
 
