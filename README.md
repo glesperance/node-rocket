@@ -364,17 +364,66 @@ To do so, rocket leverage the jade-i18n library by taking each javascript
 packages it finds in the `./locales` directory and then define the phrases it contains.
 
 For example, to define the phrase *WELCOME_MESSAGE* in *en_CA* you simply create
-a file named **en_CA.js** (in the **locales** directory) containing the following:
+a file named **en_CA.js** (in the `./locales` directory) containing the following:
 
     module.exports = {
         WELCOME_MESSAGE : 'Hello world !'
       , GOODBYE_MESSAGE : 'Bye world !'
     }
+    
+### Using locales in my **controllers**
+
+One of the *suggested* pattern to better leverage jade-i18n in your controllers
+is to use a middleware in order to (1) Detect the language of the client and (2)
+provide a version of `rocket._` (jade-i18n `_` helper) with a pre-appended 
+`lang` argument in order to allow your controllers to simply call `req._` to
+translate messages in the client's language.
+
+Such middleware would look like :
+
+    function(req, res, next) {
+      
+      var current_lang = guessLang(req)
+        ;
+      
+      req._ = function(text) {   
+        return rocket._(current_lang, text);
+      }
+      
+      next();
+      
+    }
+
+### Using locales in my **views**
+
+You can use the `_` dynamic helper just like you would with jade-i18n. 
+
+### Using locales anywhere (else)
+
+The jade-i18n package is available through `rocket.i18n` and its `_` dynamic
+helper is available through `rocket._`
 
 ## Views
 
+Rocket takes care of matching your views to your controllers so you do not have
+to define these redundant relationship.
 
+Controllers without view simply returns the JSON passed to `res.send()`.
 
 ### Controller/Views mapping
 
-### bypassing view generation with XHR queries
+Rocket maps controllers to their views in the following way :
+
+    ./controllers/root_controller.js
+        |
+        |- exports.index  = function(req,res) { /* ... */ } --> views/root/root.index.jade
+        |
+        |- exports.custom = {
+               get  : function(req, res) { /* ... */ } --> views/root/root.custom.get.jade
+             , post : function(req, req) { /* ... */ } --> views/root/root.custom.post.jade
+           }
+
+### Bypassing view generation with XHR queries
+
+In order to serve as RESTful access points, every controller returns JSON
+instead of its rendered view, when it is queried via XHR (ajax).
