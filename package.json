@@ -2,17 +2,17 @@
   "name": "rocket"
 , "description": "The rapid development framework for node.js"
 , "keywords": ["mvc", "model view controller", "comet","rapid development", "Rocket", "framework"]
-, "version": "0.0.10"
+, "version": "0.1.2"
 , "homepage": "http://wavo.me"
 , "repository":
   { "type" : "git"
   , "url" : "git://github.com/glesperance/node-rocket.git"
   }
 , "author": "Gabriel Lesperance <gabriel@wavo.me> (glesperance.com / wavo.me)"
-, "main": "rocket_main"
+, "main": "rocket"
 , "bin" : { "rocket" : "./bin/rocket.js" }
 , "engines": {
-    "node": ">= 0.4.4"
+    "node": ">= 0.4.10"
   }
 , "dependencies": {
       "express"           : ">= 2.3.12"    
@@ -20,13 +20,14 @@
     , "nopt"              : ">= 1.0.5"
     , "jade"              : ">= 0.12.4"
     , "dnode"             : ">= 0.7.3"
-    , "browserify"        : ">= 1.2.4"
-    , "coffee-script"     : ">= 1.1.1"
     , "lingo"             : ">= 0.0.4"
     , "async"             : ">= 0.1.9"
     , "underscore"        : ">= 1.1.6"
-    , "colors"            : ">= 0.5.0"
-    , "cradle"            : ">= 0.5.5"
+    , "rimraf"            : ">= 1.0.4"
+    , "oo"                : ">= 0.0.3"
+  }
+, "devDependencies": {
+    "jessie"              : ">= 0.3.7"
   }
 , "licenses" :
     [{
