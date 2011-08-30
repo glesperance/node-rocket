@@ -99,9 +99,9 @@ describe('View Module Loader', function() {
         , dummies_index_node  = dummies_node.get('index')
         , dummies_create_node = dummies_node.get('create')
         ; 
-    
-      expect(dummies_index_node).toBeUndefined();
-      expect(dummies_create_node).toBeDefined();
+      
+      expect(dummies_index_node.get('view')).toBeUndefined();
+      expect(dummies_create_node.get('view')).toBeDefined();
     
     });
     
@@ -144,11 +144,11 @@ describe('View Module Loader', function() {
         ;
         ; 
     
-      expect(stupids_index_node).toBeDefined();
-      expect(stupids_show_node).toBeDefined();
+      expect(stupids_index_node.get('view')).toBeDefined();
+      expect(stupids_show_node.get('view')).toBeDefined();
     
-      expect(dummies_index_node).toBeUndefined();
-      expect(dummies_show_node).toBeUndefined();
+      expect(dummies_index_node.get('view')).toBeUndefined();
+      expect(dummies_show_node.get('view')).toBeUndefined();
       
     });
     
