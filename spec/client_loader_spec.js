@@ -89,12 +89,12 @@ describe('Client Module Loader', function() {
     
   });
   
-  it('should properly set up a middleware to statically serve rocket\'s `rocket-js` directory ', function () {
+  it('should properly set up a middleware to statically serve rocket\'s `js/rocket` directory ', function () {
     
     var options = {
                       host: 'localhost'
                     , port: 3000
-                    , path: '/rocket-js/vendors/jquery-1.6.2.min.js'
+                    , path: '/js/rocket/vendors/jade-runtime-0.15.2.min.js'
                   }
     
       , done    = false
