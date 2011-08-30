@@ -100,12 +100,15 @@ Built on top of express -- node.js’ high performance web development framework
     |    # Contains all your client side libraries used by your client modules. 
     |
     |-- vendors
-    |    # Contains all 3rd party lirbaries used by your application.
+    |    # Contains all 3rd party libraries used by your application.
     |
     |-- views
     |    # Contains all your client jade partial files
     |
-    |-- require.config.json
+    |- require.config.json
+         # This file contains all your custom requireJS modules paths
+         # configuration. This is extremely handy to make sure you always use
+         # the latest CDN version of a public module.
     
 
 Each files/folders located under the `./client/libs/` directory of your project 
@@ -113,7 +116,7 @@ are made available to the client's browser by **Rocket** via the `require()` com
 The modules are referenced by their relative path from the `./client/js/` 
 folder.
 
-e.g. To require a moduled located at ./clients/js/a.js from the browser:
+e.g. To require a module located at ./clients/js/a.js from the browser:
 
     var a = require(['./a'], function(a) { /* ... */ });
     
@@ -124,6 +127,32 @@ doing :
     var myModuleFct = require(['./client/libs/nested/dirs/b'], function(b) { /* ... */ });
 
 Usual _CommonJS_ conventions apply to the modules.  
+
+#### Using jade templates in the browser
+
+In view of reducing the friction between the programmer and its environment
+to a minimum, rocket allows the use of jade templates on the client side, that
+is, in the browser.
+
+To do so, simply put all you jade partials files in the `client/js/view`
+directory and let rocket compile, and bundle those for you to use in the browser.
+
+To use your template in the browser, simply require it and use it.
+
+e.g. To use the template located at `client/js/views/dialog.jade` you do :
+ 
+    require(['jade-runtime', `views/dialog.jade`] function(__, dialog) {
+    
+      var html  = dialog({ title: 'Hello World !', message: 'This works!!' })
+        ;
+        
+      console.log(html);
+     
+    );
+
+#### Requiring javascript files from a CDN via require.config.json
+
+#### Production mode & Optimizations
 
 ### Serving static files via ./client/static
 
@@ -146,7 +175,7 @@ project is initially created with the following files/dirs in `./client/static/`
 
 ## Controllers
 
-By using a modified version of the powerfull [express-resource](https://github.com/visionmedia/express-resource "Express Resource - GitHub") plugin, **Rocket** provides
+By using a modified version of the powerful [express-resource](https://github.com/visionmedia/express-resource "Express Resource - GitHub") plugin, **Rocket** provides
 you with a robust way of automatically mapping your _controllers_ to your _routes_.
 
 Each time you launch your application, **Rocket** takes all the `./controllers/[controller_name]_controller.js`
@@ -280,6 +309,10 @@ function in your `./launcher.js` file :
 ### Calling your exported functions from the client -- or browser.
 
 ## Models
+
+Starting with version 0.1.x, rocket is database agnostic. If you're looking 
+forward to use a noSQL DB, we **highly** recommend you to use [mongoDB](http://www.mongodb.org/) in 
+conjunction with [mongoose](http://http://mongoosejs.com/).
 
 ## Views
 
