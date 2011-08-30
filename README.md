@@ -1,26 +1,26 @@
 # Rocket (node-rocket)
-##The rapid development framework for  node.js/couchDB/mongoDB real-time/comet web applications
+##The rapid development framework for node.js web applications
 
 <img src="https://github.com/glesperance/node-rocket/raw/master/libs/logo.png" width="200" alt="Node Rocket Rocks!" />
 
-RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of comet/real-time web applications using node.js and couchDB.
+RocketJS.net a.k.a. node-Rocket is a project created by Gabriel Lespérance during the “Startupfier Summer Kick-off: Hackathon” in order to allow rapid development of real-time web applications using node.js.
 
-Highly inspired by Ruby on Rails and cakePHP, Rocket puts forward the convention over configuration principle in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as couchDB/mongoDB distributed natures. 
+Highly inspired by Ruby on Rails and cakePHP, Rocket puts forward the convention over configuration principle in order to simplify and speedup the software development process and allow easier scalability by leveraging node.js asynchronous behavior as well as its javascript nature. 
 
-Central to RocketJS is the principle of having a single point of contact between the programmer and the underlying application and resources. Hence, RocketJS aims to blur and reduce as much as possible the separation between the client (browser), the server (node.js) and the databases (couchDB/mongoDB) while maximizing the scaling potential (for instance by allowing code sharing between couchDB and the server, and between the server and the client) and improving the performance of the resulting web application.  
+Central to RocketJS is the principle of having a single point of contact between the programmer and the underlying application and resources. Hence, RocketJS aims to blur and reduce as much as possible the separation between the client (browser) and the server (node.js) while maximizing the scaling potential (for instance by allowing code sharing between the server and the client) and improving the performance of the resulting web application.  
 
 Built on top of express -- node.js’ high performance web development framework -- RocketJS provides a robust structure on which to build your web applications without sacrificing any of your freedom.
 
 ### RocketJS Features
 * Automatic routing of your controllers
 * Automatic mapping of your views to their corresponding controller
-* Automatic creation of your couchDB databases based on your models’ definitions
-* Automatic synchronization of your couchDB design documents with your server models
-* Automatic document validation based on your model’s schemas via couchDB `validate_doc_update`
 * Easy web-socket / comet application support through dnode
 * Easy server / client code sharing allowing the client to  use CommonJS  `require()` command to import/use server JS libraries
 * High focus on RESTful controller conventions
-* Rails-like `form_tag` and `form_for` form generation
+* Client-side support for jade template
+* Automagic optimization of client javascript modules and CSS files
+* Easy i18n localization
+* Automatic reloading of modules when a modification is detected allowing easy and fast development.  
 * View rendering and partials support
 * Connect middleware support
 * Built on top of express
@@ -60,11 +60,14 @@ Built on top of express -- node.js’ high performance web development framework
     |-- exports
     |    # Contains your application's modules that will be exported to the client. 
     |
-    |-- models
-    |    # Contains all your applications's models and dataasources.
+    |-- libs
+    |    # Contains all your (other) application's libraries.
     |
-    |-- plugins
-    |     # Contains all your application's plugins.
+    |-- locales
+    |    # Contains all your localization files.
+    |
+    |-- models
+    |    # Contains all your applications's models.
     |
     |-- views
     |    # Contains your applications's main layout, template files and associated
@@ -77,29 +80,48 @@ Built on top of express -- node.js’ high performance web development framework
 
     ./client/
     |
-    |-- libs
-    |    # Contains all the javascript files that are exported (through browserify)
-    |    # to the client. All these files can then be accessed via `require()`
+    |-- css
+    |    # Contains all the CSS files that are exported to the client.
     |
+    |-- js
+    |    # Contains all the javascript files that are exported (through requireJS)
+    |    # to the client. All these files can then be accessed via `require()`
+    |    
     |-- static
          # Contains all your static files.
 
-### Allow the browser to require() your javascript modules with ./client/libs/
+### Allow the browser to require() your javascript modules with ./client/js/
+
+#### Structure of the `client/js` directory
+
+    ./client/js/
+    |
+    |-- libs
+    |    # Contains all your client side libraries used by your client modules. 
+    |
+    |-- vendors
+    |    # Contains all 3rd party lirbaries used by your application.
+    |
+    |-- views
+    |    # Contains all your client jade partial files
+    |
+    |-- require.config.json
+    
 
 Each files/folders located under the `./client/libs/` directory of your project 
 are made available to the client's browser by **Rocket** via the `require()` command.
-The modules are referenced by their relative path from the `./client/libs/` 
+The modules are referenced by their relative path from the `./client/js/` 
 folder.
 
-e.g. To require a moduled located at ./clients/libs/a.js from the browser:
+e.g. To require a moduled located at ./clients/js/a.js from the browser:
 
-    var a = require('./a');
+    var a = require(['./a'], function(a) { /* ... */ });
     
-The modules can also be located further down the `./client/libs` directory tree.
-Hence you can require the file located at `./client/libs/nested/dirs/b.js` by 
+The modules can also be located further down the `./client/js` directory tree.
+Hence you can require the file located at `./client/js/nested/dirs/b.js` by 
 doing :
 
-    var myModuleFct = require('./client/libs/nested/dirs/b').myModuleFct;
+    var myModuleFct = require(['./client/libs/nested/dirs/b'], function(b) { /* ... */ });
 
 Usual _CommonJS_ conventions apply to the modules.  
 
@@ -109,11 +131,9 @@ All files located under the `./client/static/` directory are statically served
 by **Rocket** under the `http://example.com/static/` URL.
 
 Putting forth the use of conventions common to all **Rocket** projects, every 
-project is initally created with the following files/dirs in `./client/static/`:
+project is initially created with the following files/dirs in `./client/static/`:
 
     ./client/static/
-    |
-    |-- css
     |
     |-- font
     |
@@ -189,21 +209,21 @@ In cases where you might need to derive from the RESTful conventions, **Rocket**
 provides to  you a way to add custom actions to your controllers by mapping any
 exported function but {index, new, create, show, edit, update, destroy} as follows:
 
-    {GET, POST, PUT, DELETE}  /[controller_name]/myAction  ->  myAction
+    {GET, POST, PUT, DELETE}  /[controller_name]/myAction  --------------->  myAction
 
 You can also be more specific in your mapping by making `myAction` an object:
     
-    GET     /[controller_name]/myAction/    --\
-            /[controller_name]/myAction/:id ---\-->  myAction.get
+    GET     /[controller_name]/myAction/ --------------------------------->  myAction.get
+            /[controller_name]/myAction/:[singular_controller_name] ------>  myAction.get
     
-    POST    /[controller_name]/myAction/    --\
-            /[controller_name]/myAction/:id ---\-->  myAction.post
+    POST    /[controller_name]/myAction/ --------------------------------->  myAction.post
+            /[controller_name]/myAction/:[singular_controller_name] ------>  myAction.post
     
-    PUT     /[controller_name]/myAction/    --\
-            /[controller_name]/myAction/:id ---\-->  myAction.put
+    PUT     /[controller_name]/myAction/ --------------------------------->  myAction.put
+            /[controller_name]/myAction/:[singular_controller_name] ------>  myAction.put
             
-    DELETE  /[controller_name]/myAction/    --\
-            /[controller_name]/myAction/:id ---\-->  myAction.destroy
+    DELETE  /[controller_name]/myAction/ --------------------------------->  myAction.destroy
+            /[controller_name]/myAction/:[singular_controller_name] ------>  myAction.destroy
 
 ### Exporting functions of a controller without mapping them to a route
 
@@ -261,41 +281,8 @@ function in your `./launcher.js` file :
 
 ## Models
 
-### Making worry free models using CouchDBResource
-
-* Automatically creates DB in accordance with model.name
-* Automatically SYNC your _design documents (or views, lists, updates, shows, etc)
-* Automatically SYNC your _security document
-* Automatically validates your documents on the server using model.schema and validate_doc_update
-
-#### Using model.schema to leverage Rocket automatic validation procedures
-
-#### How to invoke your couchDB views
-
-#### Creating your own validators using `validate_doc_update`
-
-##### How to properly `throw` errors for the rocket form helper
-
-#### Creating a `datasource` to keep it DRY !
-
 ## Views
 
 ### Controller/Views mapping
 
 ### bypassing view generation with XHR queries
-
-### Using the `form_tag` helper
-
-#### `select_tag`
-##### `fields_for_select`
-#### `label_tag`
-#### `text_field_tag`
-#### `text_area_tag`
-#### `password_field_tag`
-#### `hidden_field_tag`
-#### `radio_button_tag`
-#### `check_box_tag`
-#### `file_field_tag`
-#### `submit_tag`
-
-## Plugins
