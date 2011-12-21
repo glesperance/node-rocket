@@ -323,29 +323,9 @@ Auto-loading functions take the following form:
 
 For more info see [express-resource readme](https://github.com/visionmedia/express-resource "Express Resource - GitHub").
 
-## Dnode exports
+## Now.js exports
 
-By using substack's [dnode](https://github.com/substack/dnode) library, rocket 
-allows you to export server objects and make them acessible to the client.
-
-To export a module, simply create a javascript file in your `exports` directory
-and rocket will automagically, export it for you.
-
-e.g.
-
-The `exports/chat.js` file :
-
-    exports.sendMsg = function(msg) { /*...*/ } 
-    
-will be accessible through dnode in the client by doing :
-
-    require(['dnode'], function(dnode) {
-      
-      dnode.connect(function(remote) {
-        remote.chat.sendMsg('Hello world!');
-      });
-    
-    });
+*documentation comming soon!*
 
 ## Models
 
