@@ -13,7 +13,7 @@
  */
   function printUsage() {
     
-    var generators = fs.readdirSync(path.join(__dirname, '..', 'libs', 'generators'))
+    var generators = fs.readdirSync(path.join(__dirname, '..', 'lib', 'generator'))
       , generators_list = ''
       ;
     
@@ -121,10 +121,10 @@
     }
   
     if(parsed.init) {
-      require('../libs/generators/_project_generator')(parsed.init);
+      require('../lib/generator/_project_generator')(parsed.init);
     }else if(parsed.info) {
     
-        generator = require('../libs/generators/' + parsed.info + '_generator/').info();
+        generator = require('../lib/generator/' + parsed.info + '_generator/').info();
       
     }else if(parsed.add) {
       
@@ -136,7 +136,7 @@
         ;
       
       try {
-        generator = require('../libs/generators/' + parsed.add + '_generator');
+        generator = require('../lib/generator/' + parsed.add + '_generator');
       }catch(err){
           console.log(('xxx ERROR : [' + parsed.add + '] wrong element type.').red);
       }
