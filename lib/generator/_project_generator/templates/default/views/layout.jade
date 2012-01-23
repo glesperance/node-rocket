@@ -20,7 +20,12 @@ html(class='no-js', lang='en')
     
     link(rel='stylesheet', href='css/style.css')
     
-    !=rocket.header()
+    //-- { Rocket.js JS Header} -----------------
+    - if (typeof boot_options === 'undefined')
+       !=rocket.header(controller)
+    - else
+       !=rocket.header(controller, boot_options)
+    //-------------------------------------------
     
   body
     #container
@@ -29,7 +34,12 @@ html(class='no-js', lang='en')
         !=body
       footer
 
-    !=rocket.footer()
+    //-- { Rocket.js JS Footer} -----------------
+    - if (typeof boot_options === 'undefined')
+       !=rocket.header(controller)
+    - else
+       !=rocket.header(controller, boot_options)
+    //-------------------------------------------
     
     script
       window._gaq = [['_setAccount','UAXXXXXXXX1'],['_trackPageview'],['_trackPageLoadTime']];
