@@ -102,7 +102,7 @@ Built on top of express -- node.js’ high performance web development framework
     |-- vendors
     |    # Contains all 3rd party libraries used by your application.
     |
-    |-- views
+    |-- templates
     |    # Contains all your client jade partial files
     |
     |- require.config.json
@@ -134,14 +134,14 @@ Usual _RequireJS_ conventions apply to the modules.
 In view of reducing the friction between the programmer and its environment
 to a minimum, rocket allows the use of jade templates on the client side.
 
-To do so, simply put all you jade partials files in the `client/js/view`
+To do so, simply put all you jade partials files in the `client/js/templates`
 directory and let rocket compile, and bundle those for you to use in the browser.
 
 To use your template, simply require it and use it !
 
-e.g. To use the template located at `client/js/views/dialog.jade` you do :
+e.g. To use the template located at `client/js/templates/dialog.jade` you do :
  
-    require(['jade-runtime', 'views/dialog.jade'], function(__, dialog) {
+    require(['jade-runtime', 'templates/dialog.jade'], function(__, dialog) {
     
       var html  = dialog({ title: 'Hello World !', message: 'This works!!' })
         ;
@@ -164,9 +164,9 @@ you'd need the following definitions in your require.config.json file :
 
     {
         "paths" : {
-            "jquery"      : "https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min"
-          , "jqueryui"    : "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min"
-          , "underscore"  : "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.1.7/underscore-min"
+            "jquery"      : "//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min"
+          , "jqueryui"    : "//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min"
+          , "underscore"  : "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.1.7/underscore-min"
         }
     }
 
