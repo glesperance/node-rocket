@@ -1,6 +1,5 @@
 { 
-  "optimize"	: "true"
-, "baseUrl" 	: "/js"
+  "baseUrl" 	: "/js"
 , "waitSeconds" : "200"
 , "priority" 	: ["jquery"]
 , "paths" 		: {
