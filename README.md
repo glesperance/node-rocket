@@ -31,7 +31,7 @@ Built on top of express -- node.js’ high performance web development framework
     
 ## Initializing Your Project
 
-    rocket -I My-Rocket-Project
+    rocket -I MyRocketProject; cd MyRocketProject; npm update
 
 ## Directory Structure of a Rocket Project
 
