@@ -29,22 +29,9 @@ Built on top of express -- node.js’ high performance web development framework
 
     $ npm install rocket
     
-## Usage
-  
-    Usage: rocket [command] [argument(s)]
+## Initializing Your Project
 
-    Options:
-      -v, --version................................Prints RocketJS' version
-      -h, --help...................................Prints this message
-                                                     *** Use --kill to stop the server *** Used in conjunction with --start
-    
-    Commands:
-      -I, --init [project name]....................Initialize project app
-      -a, --add  [options].........................Add a [type] object to the current project working directory
-                                                     do --info [type] for more info
-      -i, --info [type]............................Prints usage information about [type] object
-    
-    Available object types: controller 
+    rocket -I My-Rocket-Project
 
 ## Directory Structure of a Rocket Project
 
@@ -118,14 +105,14 @@ folder.
 
 e.g. To require a module located at ./clients/js/a.js from the browser:
 
-    var a = require(['./a'], function(a) { /* ... */ });
+    require(['./a'], function(a) { /* ... */ });
     
 The modules can also be located further down the `./client/js` directory tree.
 Hence you can require the file located at `./client/js/nested/dirs/b.js` by 
 doing :
     
     //NB do **NOT** put the `.js` after the filename !!
-    var myModuleFct = require(['./client/libs/nested/dirs/b'], function(b) { /* ... */ });
+    require(['./client/libs/nested/dirs/b'], function(b) { /* ... */ });
 
 Usual _RequireJS_ conventions apply to the modules.  
 
@@ -348,7 +335,7 @@ will be accessible through nowjs in the client by doing :
 ## Models
 
 Starting with version 0.1.x, rocket is database agnostic. If you're looking 
-forward to using a noSQL DB, we **highly** recommend you to use [mongoDB](http://www.mongodb.org/) in 
+forward to using a noSQL DB, we recommend you to use [mongoDB](http://www.mongodb.org/) in 
 conjunction with [mongoose](http://http://mongoosejs.com/).
 
 ## Locales
