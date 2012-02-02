@@ -325,7 +325,25 @@ For more info see [express-resource readme](https://github.com/visionmedia/expre
 
 ## Now.js exports
 
-*documentation comming soon!*
+By using [nowjs](http://nowjs.com/), rocket 
+allows you to export server objects and make them accessible to the client.
+
+To export a module, simply create a javascript file in your `exports` directory
+and rocket will automagically, export it for you.
+
+e.g.
+
+The `exports/chat.js` file :
+
+    exports.sendMsg = function(msg) { /*...*/ } 
+    
+will be accessible through nowjs in the client by doing :
+
+    require(['now'], function(dnode) {
+      now.ready(function() {
+	    now.chat.sendMsg('Hello world!');
+	  });
+    });
 
 ## Models
 
