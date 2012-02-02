@@ -33,6 +33,12 @@ Built on top of express -- node.js’ high performance web development framework
 
     rocket -I MyRocketProject; cd MyRocketProject; npm update
 
+## Launching Your Project
+
+While in your project's directory simply do :
+
+	node launcher.js
+	
 ## Directory Structure of a Rocket Project
 
     ./
