@@ -15,20 +15,20 @@
     "node": ">= 0.4.10"
   }
 , "dependencies": {
-      "express"           : ">= 2.3.12"    
-    , "express-resource"  : ">= 0.2.1"
-    , "nopt"              : ">= 1.0.5"
-    , "jade"              : ">= 0.12.4"
-    , "lingo"             : ">= 0.0.4"
-    , "async"             : ">= 0.1.9"
-    , "async-fs"          : ">= 0.0.2"
-    , "underscore"        : ">= 1.1.6"
-    , "rimraf"            : ">= 1.0.4"
-    , "oo"                : ">= 0.0.3"
+      "express"           : "2.5.x"    
+    , "express-resource"  : "0.2.x"
+    , "nopt"              : "1.0.x"
+    , "jade"              : "0.24.x"
+    , "lingo"             : "0.0.x"
+    , "async"             : "0.1.x"
+    , "async-fs"          : "0.0.x"
+    , "underscore"        : "1.3.x"
+    , "rimraf"            : "2.0.x"
+    , "oo"                : "0.0.x"
     , "jade-i18n"         : "= 0.0.2"
-    , "now"               : ">= 0.7.4"
-	  , "colors"			      : "0.6.x"
-	 , "gzippo"	  		      : "0.1.4"
+    , "now"               : "0.8.x"
+    , "colors"            : "0.6.x"
+    , "gzippo"            : "0.1.x"
   }
 , "devDependencies": {
   }
