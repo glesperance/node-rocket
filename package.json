@@ -2,7 +2,7 @@
   "name": "rocket"
 , "description": "The rapid development framework for node.js"
 , "keywords": ["mvc", "model view controller", "comet","rapid development", "Rocket", "framework"]
-, "version": "0.5.1"
+, "version": "0.5.2"
 , "homepage": "http://wavo.me"
 , "repository":
   { "type" : "git"
@@ -17,8 +17,8 @@
 , "dependencies": {
       "express"           : "2.5.x"    
     , "express-resource"  : "0.2.x"
-    , "nopt"              : "1.0.x"
-    , "jade"              : "0.24.x"
+    , "nopt"              : "2.0.x"
+    , "jade"              : "0.26.x"
     , "lingo"             : "0.0.x"
     , "async"             : "0.1.x"
     , "async-fs"          : "0.0.x"
@@ -28,8 +28,7 @@
     , "jade-i18n"         : "= 0.0.2"
     , "now"               : "0.8.x"
     , "colors"            : "0.6.x"
-    , "gzippo"            : "0.1.x"
-    , "requirejs"         : "1.0.x"
+    , "requirejs"         : "2.0.x"
   }
 , "devDependencies": {
   }
