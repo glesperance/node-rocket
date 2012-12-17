@@ -2,7 +2,7 @@
   "name": "rocket"
 , "description": "The rapid development framework for node.js"
 , "keywords": ["mvc", "model view controller", "comet","rapid development", "Rocket", "framework"]
-, "version": "0.5.6"
+, "version": "0.5.7"
 , "homepage": "http://wavo.me"
 , "repository":
   { "type" : "git"
