@@ -1,3 +1,4 @@
+# !!! IMPORTANT NOTICE !!! Rocket is no longer maintained.
 
 Please consider rocket to be no longer under active development. 
 It is now only maintained and modified to support Wavo.me. 
