@@ -1,3 +1,15 @@
+
+Please consider rocket to be no longer under active development. 
+It is now only maintained and modified to support Wavo.me. 
+ 
+If you're still looking for a good development framework for node.js, please consider [Meteor](https://meteor.com/) or the more mature [Express Engine](http://expressjs.com/). 
+ 
+Rocket was a amazing experiment, and although I'd do things differently if I was to program it again, I am very proud of what has been achieved. 
+ 
+Finally, I'd like to thank all of those who supported the project and that helped me work on it.
+
+Gabriel Lespérance
+
 # Rocket (node-rocket)
 ##The rapid development framework for node.js web applications
 
