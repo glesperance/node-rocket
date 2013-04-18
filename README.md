@@ -1,7 +1,7 @@
 # !!! IMPORTANT NOTICE !!! Rocket is no longer maintained.
 
 Please consider rocket to be no longer under active development. 
-It is now only maintained and modified to support Wavo.me. 
+It is now only maintained and modified to support [Wavo.me](https://wavo.me). 
  
 If you're still looking for a good development framework for node.js, please consider [Meteor](https://meteor.com/) or the more mature [Express Engine](http://expressjs.com/). 
  
